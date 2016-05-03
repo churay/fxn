@@ -1,1 +1,1 @@
-Source Repository for the "bbg" Game Prototype
+Source Repository for the "fxn" Game Prototype
