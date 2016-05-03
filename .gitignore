@@ -1,0 +1,22 @@
+## Debugging Files ##
+debug/*
+
+## Compiled Binary Files ##
+bin/*
+
+## Compiled Source Files ##
+*.o
+*.so
+
+## Package Files ##
+*.tar
+*.zip
+*.rar
+
+## Logs Files ##
+*.log
+
+## OS Files ##
+*.swp
+*.swo
+*.*.sw*
