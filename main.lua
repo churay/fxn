@@ -1,6 +1,7 @@
--- TODO(JRC): Eliminate this path inclusion somehow.
-package.path = package.path .. ";fxn/?.lua"
+package.path = package.path .. ";fxn/?.lua;etc/?.lua"
+
 local fxn = require( "fxn" )
+-- local dbg = require( "debugger" )
 
 function love.run()
   math.randomseed( os.time() )
@@ -37,7 +38,8 @@ function love.run()
 end
 
 function love.load()
-  
+  print(fxn)
+  print(dbg)
 end
 
 function love.keypressed( key, scancode, isrepeat )
