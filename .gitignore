@@ -1,12 +1,12 @@
-## Debugging Files ##
-etc/debugger.lua
-
 ## Compiled Binary Files ##
 bin/*
 
 ## Compiled Source Files ##
 *.o
 *.so
+
+## Debugging Files ##
+opt/debugger.lua
 
 ## Package Files ##
 *.tar

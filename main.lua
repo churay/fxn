@@ -1,4 +1,4 @@
-package.path = package.path .. ";fxn/?.lua;etc/?.lua"
+package.path = package.path .. ";fxn/?.lua;opt/?.lua"
 
 local fxn = require( "fxn" )
 -- local dbg = require( "debugger" )
@@ -9,8 +9,8 @@ function love.run()
   if love.load then love.load( arg ) end
   if love.timer then love.timer.step() end
 
-  local dt = 0
   local isrunning = true
+  local framestart, frameend, frameleftover = 0, 0, 0
   while isrunning do
     if love.event then
       love.event.pump()
@@ -20,26 +20,29 @@ function love.run()
       end
     end
 
-    if love.timer then
-      love.timer.step()
-      dt = love.timer.getDelta()
-    end
-
+    framestart = love.timer and love.timer.getTime() or 0
     if love.getinput then love.getinput() end
-    if love.update then love.update( dt ) end
+    if love.update then love.update( fxn.global.fdt ) end
     if love.window and love.graphics and love.window.isCreated() then
       love.graphics.clear( 0, 0, 0 )
       love.draw()
       love.graphics.present()
     end
+    frameend = love.timer and love.timer.getTime() or 0
 
-    if love.timer then love.timer.sleep( 1.0e-3 ) end
+    if love.timer then
+      frameleftover = fxn.global.fdt - ( frameend - framestart )
+      if frameleftover > 0 then love.timer.sleep( frameleftover ) end
+      love.timer.step()
+    end
   end
 end
 
 function love.load()
-  print(fxn)
-  print(dbg)
+  fxn.global = {}
+
+  fxn.global.fps = 60
+  fxn.global.fdt = 1.0 / fxn.global.fps
 end
 
 function love.keypressed( key, scancode, isrepeat )
@@ -51,5 +54,5 @@ function love.update( dt )
 end
 
 function love.draw()
-  love.graphics.print( "Hello World", 400, 300 )
+  love.graphics.clear( 255, 255, 255 )
 end
