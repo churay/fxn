@@ -1,7 +1,7 @@
-package.path = package.path .. ";fxn/?.lua;opt/?.lua"
+package.path = package.path .. ';fxn/?.lua;opt/?.lua'
 
-local fxn = require( "fxn" )
--- local dbg = require( "debugger" )
+local fxn = require( 'fxn' )
+-- local dbg = require( 'debugger' )
 
 function love.run()
   math.randomseed( os.time() )
@@ -15,7 +15,7 @@ function love.run()
     if love.event then
       love.event.pump()
       for levent, a, b, c, d in love.event.poll() do
-        if levent == "quit" then isrunning = false end
+        if levent == 'quit' then isrunning = false end
         love.handlers[levent]( a, b, c, d )
       end
     end
@@ -46,7 +46,7 @@ function love.load()
 end
 
 function love.keypressed( key, scancode, isrepeat )
-  if key == "q" then love.event.quit() end
+  if key == 'q' then love.event.quit() end
 end
 
 function love.update( dt )

@@ -1,9 +1,9 @@
 function love.conf( config )
-  config.identity = "fxn"
-  config.version = "0.10.1"
+  config.identity = 'fxn'
+  config.version = '0.10.1'
   config.console = false
 
-  config.window.title = "fxn"
+  config.window.title = 'fxn'
   config.window.icon = nil
   config.window.borderless = false
   config.window.resizable = false
