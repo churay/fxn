@@ -22,7 +22,7 @@ function love.run()
 
     framestart = love.timer and love.timer.getTime() or 0
     if love.getinput then love.getinput() end
-    if love.update then love.update( fxn.global.fdt ) end
+    if love.update then love.update( fxn.global.fdt + math.max(-frameleftover, 0) ) end
     if love.window and love.graphics and love.window.isCreated() then
       love.graphics.clear( 0, 0, 0 )
       love.draw()
@@ -41,7 +41,7 @@ end
 function love.load()
   fxn.global = {}
 
-  fxn.global.fps = 60
+  fxn.global.fps = 60.0
   fxn.global.fdt = 1.0 / fxn.global.fps
 end
 
