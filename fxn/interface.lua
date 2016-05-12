@@ -1,0 +1,3 @@
+local interface = {}
+
+return interface

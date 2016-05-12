@@ -1,0 +1,3 @@
+local struct = {}
+
+return struct
