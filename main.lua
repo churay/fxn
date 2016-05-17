@@ -10,7 +10,7 @@ function love.run()
   if love.timer then love.timer.step() end
 
   local isrunning = true
-  local framestart, frameend, frameleftover = 0, 0, 0
+  local framestart, frameend, frameleft = 0, 0, 0
   while isrunning do
     if love.event then
       love.event.pump()
@@ -22,7 +22,7 @@ function love.run()
 
     framestart = love.timer and love.timer.getTime() or 0
     if love.getinput then love.getinput() end
-    if love.update then love.update( fxn.global.fdt + math.max(-frameleftover, 0) ) end
+    if love.update then love.update( fxn.const.fdt + math.max(-frameleft, 0) ) end
     if love.window and love.graphics and love.window.isCreated() then
       love.graphics.clear( 0, 0, 0 )
       love.draw()
@@ -31,18 +31,15 @@ function love.run()
     frameend = love.timer and love.timer.getTime() or 0
 
     if love.timer then
-      frameleftover = fxn.global.fdt - ( frameend - framestart )
-      if frameleftover > 0 then love.timer.sleep( frameleftover ) end
+      frameleft = fxn.const.fdt - ( frameend - framestart )
+      if frameleft > 0 then love.timer.sleep( frameleft ) end
       love.timer.step()
     end
   end
 end
 
 function love.load()
-  fxn.global = {}
-
-  fxn.global.fps = 60.0
-  fxn.global.fdt = 1.0 / fxn.global.fps
+  
 end
 
 function love.keypressed( key, scancode, isrepeat )

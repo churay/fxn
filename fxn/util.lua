@@ -13,13 +13,19 @@ end
 
 --[[ System Functions ]]--
 
--- TODO(JRC): This function currently only supports Unix operating systems and
--- should be expanded to support Windows systems.
-function util.ls( d )
-  local items = {}
-  local pitems = io.popen( 'ls -la ' .. d )
-  for item in pitems:lines() do table.insert( items, item ) end
-  return items
+function util.libload( libbase )
+  local lib = {}
+
+  local plibpaths = io.popen( 'ls -1a ' .. libbase )
+  for libpath in plibpaths:lines() do
+    if string.match( libpath, '^.*%.lua$' ) and libpath ~= 'init.lua' then
+      local libmodule = string.sub( libpath, 1, string.find(libpath, '%.lua$')-1 )
+      lib[libmodule] = require( libmodule )
+    end
+  end
+  plibpaths:close()
+
+  return lib
 end
 
 --[[ Lua Language Functions ]]--
