@@ -3,13 +3,12 @@
 -- - [x] Automatic population with all of the modules in the library directory.
 -- - [ ] Fetching of modules on-demand to make it possible to import only subsets
 --   of the library.
+-- - [ ] Extend the loading code to be capable of handling an arbitrary base
+--   directory so that the code can be executed in locations aside from the
+--   project root.
 
 local fxn = {}
 
--- TODO(JRC): Extend this code to be capable of handling an arbitrary base
--- directory so this code can be used in multiple libraries.
--- TODO(JRC): Extend this code so that it can recursve to subdirectories and
--- load modules in these directories.
 local fxnmodules = {}
 local pfxnfilenames = io.popen( 'ls -1a fxn' )
 for fxnfilename in pfxnfilenames:lines() do
