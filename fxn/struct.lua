@@ -18,10 +18,49 @@
 -- - ...
 -- - Last Pattern
 
-local struct = {}
+local function struct( ... )
+  local newstruct = {}
+
+  local basestructs = { ... }
+  for sidx = #basestructs, 1, -1 do
+    local basestruct = baststructs[sidx]
+    local basestructmt = getmetatable( basestruct )
+
+    for sk, sv in pairs( basestructmt ) do newstruct[sk] = sv end
+    for sk, sv in pairs( basestruct ) do newstruct[sk] = sv end
+  end
+
+  newstruct.__index = newstruct
+  newstruct.__call = function()
+    return setmetatable( {}, newstruct )
+  end
+
+  return newstruct
+end
 
 return struct
 
+--[[
+local test = struct()
+
+function test.getz( self )
+  return 0
+end
+
+local derp = test()
+
+
+s.x = 10
+s.y = 10
+s.z = 10
+local test = struct()
+
+function test.getz( self )
+  return 0
+end
+
+local derp = test()
+]]--
 
 --[[
 The following is an example implementation using a Go struct:
