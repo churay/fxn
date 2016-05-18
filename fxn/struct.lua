@@ -20,22 +20,25 @@
 
 local function struct( basetable, ... )
   local newstruct = basetable or {}
+  local newstructmt = {}
 
-  local basestructs = { ... }
+  local basestructs = ... and { ... } or {}
   for sidx = #basestructs, 1, -1 do
-    local basestruct = baststructs[sidx]
-    local basestructmt = getmetatable( basestruct )
+    local basestruct = basestructs[sidx]
+    local basestructmt = getmetatable( basestruct ) or {}
 
     for sk, sv in pairs( basestructmt ) do newstruct[sk] = sv end
     for sk, sv in pairs( basestruct ) do newstruct[sk] = sv end
   end
 
   newstruct.__index = newstruct
-  newstruct.__call = function( ovrdtable )
+  newstructmt.__call = function( overtable )
     local objtable = setmetatable( {}, newstruct )
-    for ok, ov in pairs( ovrdtable ) do objtable[ok] = ov end
+    for ok, ov in pairs( overtable ) do objtable[ok] = ov end
     return objtable
   end
+
+  setmetatable( newstruct, newstructmt )
 
   return newstruct
 end

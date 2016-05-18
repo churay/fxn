@@ -60,7 +60,7 @@ function util.len( l )
 end
 
 function util.pack( ... )
-  return { n = select("#", ...), ... }
+  return { n = select('#', ...), ... }
 end
 
 function util.unpack( vargs )

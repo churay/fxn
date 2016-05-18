@@ -35,10 +35,10 @@ $(FXN_LOVE) love : $(wildcard $(PROJ_DIR)/*.lua) $(wildcard $(LUA_DIR)/*.lua) | 
 main :
 	$(LUA_RUNNER) $(LUA_RUNNER_FLAGS) $(PROJ_DIR)
 
-tests : $(wildcard $(LUA_DIR)/*.lua) $(wildcard $(TEST_DIR)/*.lua)
-	$(LUA_TESTER) $(LUA_TESTER_FLAGS) --pattern='_test' $(TEST_DIR)
+specs : $(wildcard $(LUA_DIR)/*.lua) $(wildcard $(TEST_DIR)/*.lua)
+	$(LUA_TESTER) $(LUA_TESTER_FLAGS) --pattern='_spec' $(TEST_DIR)
 
-%_test : $(TEST_DIR)/%_test.lua
+%_spec : $(TEST_DIR)/%_spec.lua
 	$(LUA_TESTER) $(LUA_TESTER_FLAGS) --pattern='$(basename $(<F))' $(TEST_DIR)
 
 $(BIN_DIR) $(ETC_DIR) :
