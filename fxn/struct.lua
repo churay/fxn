@@ -18,8 +18,8 @@
 -- - ...
 -- - Last Pattern
 
-local function struct( ... )
-  local newstruct = {}
+local function struct( basetable, ... )
+  local newstruct = basetable or {}
 
   local basestructs = { ... }
   for sidx = #basestructs, 1, -1 do
@@ -31,8 +31,10 @@ local function struct( ... )
   end
 
   newstruct.__index = newstruct
-  newstruct.__call = function()
-    return setmetatable( {}, newstruct )
+  newstruct.__call = function( ovrdtable )
+    local objtable = setmetatable( {}, newstruct )
+    for ok, ov in pairs( ovrdtable ) do objtable[ok] = ov end
+    return objtable
   end
 
   return newstruct
@@ -41,25 +43,21 @@ end
 return struct
 
 --[[
-local test = struct()
+local test = struct({s=10, y=20})
 
-function test.getz( self )
-  return 0
+function test.gets( self )
+  return self.s
 end
 
-local derp = test()
-
-
-s.x = 10
-s.y = 10
-s.z = 10
-local test = struct()
-
-function test.getz( self )
-  return 0
+function test.gety( self )
+  return self.y
 end
 
-local derp = test()
+local derp = test() -- pass in nothing, get default values
+print(derp:gets())
+
+local herp = test({s=22}) -- pass in table, table values will override (only if already exist)
+print(derp:gets())
 ]]--
 
 --[[
