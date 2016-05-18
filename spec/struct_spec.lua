@@ -1,4 +1,5 @@
 local struct = require( 'fxn.struct' )
+local dbg = require( 'debugger' )
 
 describe( 'struct', function()
   --[[ Testing Constants ]]--
@@ -19,6 +20,17 @@ describe( 'struct', function()
   local overobj = nil
   local descobj = nil
 
+  --[[ Testing Helper Functions ]]--
+
+  -- NOTE(JRC): Retrieves all fields in an object that aren't metafunctions.
+  local function getfields( t )
+    local fields = {}
+    for field, _ in pairs( t ) do
+      if not string.match( field, '^__.*$' ) then table.insert( fields, field ) end
+    end
+    return fields
+  end
+
   --[[ Set Up / Tear Down Functions ]]--
 
   before_each( function()
@@ -27,6 +39,7 @@ describe( 'struct', function()
     base_t.getname = function( self ) return BASE_NAME end
 
     over_t = struct( {val=OVER_VAL}, base_t )
+    over_t.getval = function( self ) return self.val end
     over_t.getname = function( self ) return OVER_NAME end
 
     desc_t = struct( nil, base_t )
@@ -48,16 +61,20 @@ describe( 'struct', function()
 
   --[[ Testing Functions ]]--
 
+  it( 'distributes all default fields to structs', function()
+    assert.is.truthy( base_t['val'] )
+    assert.are.equal( BASE_VAL, base_t['val'] )
+  end )
+
   it( 'distributes all fields to struct instances', function()
-    for field, _ in pairs( base_t ) do
+    for _, field in ipairs( getfields(base_t) ) do
       assert.is.truthy( baseobj[field] )
     end
   end )
 
   it( 'distributes the same fields to all struct instances', function()
     local baseobj2 = base_t()
-
-    for field, _ in pairs( base_t ) do
+    for _, field in ipairs( getfields(base_t) ) do
       assert.are.equal( base_t[field], baseobj[field] )
       assert.are.equal( base_t[field], baseobj2[field] )
     end
@@ -73,18 +90,15 @@ describe( 'struct', function()
   end )
 
   it( 'distributes all nonoverridden fields to derived structs', function()
-    for field, _ in pairs( desc_t ) do
+    for _, field in ipairs( getfields(desc_t) ) do
       assert.are.equal( base_t[field], desc_t[field] )
     end
   end )
 
   it( 'supports field overriding in derived structs', function()
-    for field, _ in pairs( over_t ) do
-      if field ~= 'getval' then
-        assert.are_not.equal( base_t[field], over_t[field] )
-      end
+    for _, field in ipairs( getfields(over_t) ) do
+      assert.are_not.equal( base_t[field], over_t[field] )
     end
-    assert.are.equal( base_t['getval'], over_t['getval'] )
 
     assert.are.equal( OVER_VAL, overobj:getval() )
     assert.are.equal( OVER_NAME, overobj:getname() )

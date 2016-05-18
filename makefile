@@ -3,13 +3,13 @@
 LUA_RUNNER = love
 LUA_RUNNER_FLAGS =
 LUA_TESTER = busted
-LUA_TESTER_FLAGS = --lpath='$(LUA_DIR)/?.lua;$(PROJ_DIR)/?/init.lua;$(TEST_DIR)/?.lua'
+LUA_TESTER_FLAGS = --lpath='$(LUA_DIR)/?.lua;$(OPT_DIR)/?.lua;$(TEST_DIR)/?.lua'
 
 ### Project Files and Directories ###
 
 PROJ_DIR = .
 BIN_DIR = $(PROJ_DIR)/bin
-ETC_DIR = $(PROJ_DIR)/etc
+OPT_DIR = $(PROJ_DIR)/opt
 LUA_DIR = $(PROJ_DIR)/fxn
 TEST_DIR = $(PROJ_DIR)/spec
 
