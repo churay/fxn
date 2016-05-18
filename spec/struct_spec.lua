@@ -1,14 +1,13 @@
-local struct = require( "fxn.struct" )
+local struct = require( 'fxn.struct' )
 
-describe( "struct", function()
+describe( 'struct', function()
   --[[ Testing Constants ]]--
 
   local BASE_VAL = 1
   local OVER_VAL = 2
-  local NONDEF_VAL = 3
 
-  local BASE_NAME = "base"
-  local OVER_NAME = "over"
+  local BASE_NAME = 'base'
+  local OVER_NAME = 'over'
 
   --[[ Testing Variables ]]--
 
@@ -19,7 +18,6 @@ describe( "struct", function()
   local baseobj = nil
   local overobj = nil
   local descobj = nil
-  local nondefobj = nil
 
   --[[ Set Up / Tear Down Functions ]]--
 
@@ -36,7 +34,6 @@ describe( "struct", function()
     baseobj = base_t()
     overobj = over_t()
     descobj = desc_t()
-    nondefobj = desc_t( {val=NONDEF_VAL} )
   end )
 
   after_each( function()
@@ -47,18 +44,17 @@ describe( "struct", function()
     baseobj = nil
     overobj = nil
     descobj = nil
-    nondefobj = nil
   end )
 
   --[[ Testing Functions ]]--
 
-  it( "distributes all functions to type instances", function()
+  it( 'distributes all fields to struct instances', function()
     for field, _ in pairs( base_t ) do
       assert.is.truthy( baseobj[field] )
     end
   end )
 
-  it( "distributes the same functions to all type instances", function()
+  it( 'distributes the same fields to all struct instances', function()
     local baseobj2 = base_t()
 
     for field, _ in pairs( base_t ) do
@@ -67,42 +63,35 @@ describe( "struct", function()
     end
   end )
 
+  it( 'allows instances to use their structs fields', function()
+    assert.are.equal( BASE_VAL, baseobj:getval() )
+    assert.are.equal( BASE_NAME, baseobj:getname() )
+  end )
+
+  it( 'disallows accesses to undefined fields in the struct', function()
+    assert.is.equal( nil, baseobj['undefined'] )
+  end )
+
+  it( 'distributes all nonoverridden fields to derived structs', function()
+    for field, _ in pairs( desc_t ) do
+      assert.are.equal( base_t[field], desc_t[field] )
+    end
+  end )
+
+  it( 'supports field overriding in derived structs', function()
+    for field, _ in pairs( over_t ) do
+      if field ~= 'getval' then
+        assert.are_not.equal( base_t[field], over_t[field] )
+      end
+    end
+    assert.are.equal( base_t['getval'], over_t['getval'] )
+
+    assert.are.equal( OVER_VAL, overobj:getval() )
+    assert.are.equal( OVER_NAME, overobj:getname() )
+  end )
+
   --[[
-  it( "allows instances to use their type's functions", function()
-    assert.are.equal( BASE_VALUE, baseobject:getval() )
-    assert.are.equal( BASE_NAME, baseobject:tostr() )
-  end )
-
-  it( "throws errors when undefined type functions are invoked", function()
-    -- TODO(JRC): This test should be changed to use `assert.has_error`.
-    assert.is.equal( nil, baseobject["undefinedfxn"] )
-  end )
-
-  it( "properly sets the 'super' field to the type's parent type", function()
-    assert.is.truthy( BaseClass._super )
-    assert.are.equal( BaseClass, OverrideClass._super )
-    assert.are.equal( BaseClass, InheritClass._super )
-    assert.are.equal( InheritClass, DescendentClass._super )
-  end )
-
-  it( "distributes all nonoverridden functions to child types", function()
-    for _, fxn in pairs( CLASS_FUNCTIONS ) do
-      assert.are.equal( BaseClass[fxn], InheritClass[fxn] )
-    end
-
-    assert.are.equal( InheritClass._init, DescendentClass._init )
-    assert.are.equal( InheritClass.getval, DescendentClass.getval )
-  end )
-
-  it( "supports function overriding in child classes", function()
-    for _, fxn in pairs( CLASS_FUNCTIONS ) do
-      assert.are_not.equal( BaseClass[fxn], OverrideClass[fxn] )
-    end
-
-    assert.are_not.equal( InheritClass.tostr, DescendentClass.tostr )
-  end )
-
-  it( "distributes the function override from the nearest type", function()
+  it( 'distributes the function override from the nearest type', function()
     assert.are.equal( OVERRIDE_VALUE, overrideobject:getval() - 1 )
     assert.are.equal( OVERRIDE_NAME, overrideobject:tostr() )
 
@@ -113,7 +102,7 @@ describe( "struct", function()
     assert.are.equal( DESCENDENT_NAME, descendentobject:tostr() )
   end )
 
-  it( "allows instance types to be determined through 'istype'", function()
+  it( 'allows instance types to be determined through 'istype'', function()
     local obj2objtypes = _getobj2typetable()
 
     for obj, objtype in pairs( obj2objtypes ) do
@@ -122,7 +111,7 @@ describe( "struct", function()
     end
   end )
 
-  it( "allows instance classes to be determined through 'isa'", function()
+  it( 'allows instance classes to be determined through 'isa'', function()
     local obj2objtypes = _getobj2typetable()
 
     for obj, objtype in pairs( obj2objtypes ) do
