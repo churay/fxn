@@ -14,11 +14,9 @@ describe( 'struct', function()
 
   local base_t = nil
   local over_t = nil
-  local desc_t = nil
 
   local baseobj = nil
   local overobj = nil
-  local descobj = nil
 
   --[[ Testing Helper Functions ]]--
 
@@ -42,21 +40,16 @@ describe( 'struct', function()
     over_t.getval = function( self ) return self.val end
     over_t.getname = function( self ) return OVER_NAME end
 
-    desc_t = struct( nil, base_t )
-
     baseobj = base_t()
     overobj = over_t()
-    descobj = desc_t()
   end )
 
   after_each( function()
     base_t = nil
     over_t = nil
-    desc_t = nil
 
     baseobj = nil
     overobj = nil
-    descobj = nil
   end )
 
   --[[ Testing Functions ]]--
@@ -90,6 +83,8 @@ describe( 'struct', function()
   end )
 
   it( 'distributes all nonoverridden fields to derived structs', function()
+    desc_t = struct( nil, base_t )
+
     for _, field in ipairs( getfields(desc_t) ) do
       assert.are.equal( base_t[field], desc_t[field] )
     end
@@ -104,38 +99,36 @@ describe( 'struct', function()
     assert.are.equal( OVER_NAME, overobj:getname() )
   end )
 
-  --[[
-  it( 'distributes the function override from the nearest type', function()
-    assert.are.equal( OVERRIDE_VALUE, overrideobject:getval() - 1 )
-    assert.are.equal( OVERRIDE_NAME, overrideobject:tostr() )
+  it( 'supports field distribution from multiple specified base structs', function()
+    local orth_t = struct( {data=OVER_VAL} )
+    orth_t.gettype = function( self ) return 'basealt_t' end
+    local multi_t = struct( nil, base_t, orth_t )
 
-    assert.are.equal( BASE_VALUE, inheritobject:getval() )
-    assert.are.equal( BASE_NAME, inheritobject:tostr() )
-
-    assert.are.equal( BASE_VALUE, descendentobject:getval() )
-    assert.are.equal( DESCENDENT_NAME, descendentobject:tostr() )
-  end )
-
-  it( 'allows instance types to be determined through 'istype'', function()
-    local obj2objtypes = _getobj2typetable()
-
-    for obj, objtype in pairs( obj2objtypes ) do
-      assert.is_true( obj:istype(objtype) )
-      assert.is_true( objtype == BaseClass or not obj:istype(BaseClass) )
+    for _, field in ipairs( getfields(base_t) ) do
+      assert.are.equal( base_t[field], multi_t[field] )
+    end
+    for _, field in ipairs( getfields(orth_t) ) do
+      assert.are.equal( orth_t[field], multi_t[field] )
     end
   end )
 
-  it( 'allows instance classes to be determined through 'isa'', function()
-    local obj2objtypes = _getobj2typetable()
+  it( 'distributes fields to derived structs with field priority being ' ..
+      'taken in struct specification order', function()
+    local basealt_t = struct( {val=OVER_VAL} )
+    basealt_t.gettype = function( self ) return 'basealt_t' end
+    basealt_t.getname = function( self ) return OVER_NAME end
+    local complex_t = struct( nil, base_t, basealt_t )
 
-    for obj, objtype in pairs( obj2objtypes ) do
-      assert.is_true( obj:isa(objtype) )
-      assert.is_true( obj:isa(BaseClass) )
+    for _, field in ipairs( getfields(base_t) ) do
+      assert.are.equal( base_t[field], complex_t[field] )
     end
-
-    assert.is_false( inheritobject:isa(OverrideClass) )
-    assert.is_false( overrideobject:isa(InheritClass) )
+    for _, field in ipairs( getfields(basealt_t) ) do
+      if not base_t[field] then
+        assert.are.equal( basealt_t[field], complex_t[field] )
+      else
+        assert.are_not.equal( basealt_t[field], complex_t[field] )
+      end
+    end
   end )
-  ]]--
 
 end )
