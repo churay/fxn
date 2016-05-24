@@ -40,7 +40,7 @@ function util.reduce( l, facc, v0 )
   local liter, lnext = next( l, nil )
   local vacc = v0
 
-  if not vacc then
+  if vacc == nil then
     vacc = lnext
     liter, lnext = next( l, liter )
   end

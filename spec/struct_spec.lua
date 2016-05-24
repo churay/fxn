@@ -121,5 +121,4 @@ describe( 'struct', function()
       end
     end
   end )
-
 end )
