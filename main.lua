@@ -22,7 +22,7 @@ function love.run()
 
     framestart = love.timer and love.timer.getTime() or 0
     if love.getinput then love.getinput() end
-    if love.update then love.update( fxn.const.fdt + math.max(-frameleft, 0) ) end
+    if love.update then love.update( fxn.global.fdt + math.max(-frameleft, 0) ) end
     if love.window and love.graphics and love.window.isCreated() then
       love.graphics.clear( 0, 0, 0 )
       love.draw()
@@ -31,7 +31,7 @@ function love.run()
     frameend = love.timer and love.timer.getTime() or 0
 
     if love.timer then
-      frameleft = fxn.const.fdt - ( frameend - framestart )
+      frameleft = fxn.global.fdt - ( frameend - framestart )
       if frameleft > 0 then love.timer.sleep( frameleft ) end
       love.timer.step()
     end
