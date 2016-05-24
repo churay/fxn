@@ -1,5 +1,4 @@
 local struct = require( 'fxn.struct' )
-local dbg = require( 'debugger' )
 
 describe( 'struct', function()
   --[[ Testing Constants ]]--
@@ -42,14 +41,6 @@ describe( 'struct', function()
 
     baseobj = base_t()
     overobj = over_t()
-  end )
-
-  after_each( function()
-    base_t = nil
-    over_t = nil
-
-    baseobj = nil
-    overobj = nil
   end )
 
   --[[ Testing Functions ]]--
