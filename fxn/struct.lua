@@ -15,7 +15,7 @@ local function struct( basestructs, ... )
   end
 
   newstruct.__index = newstruct
-  newstructmt.__call = function( structtable, ... )
+  newstructmt.__call = function( newstruct_t, ... )
     local objtable = setmetatable( {}, newstruct )
 
     if objtable._init ~= nil then

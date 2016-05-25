@@ -45,37 +45,75 @@ describe( 'struct', function()
 
   --[[ Testing Functions ]]--
 
-  it( 'distributes all default fields to structs', function()
-    assert.is.truthy( base_t['val'] )
-    assert.are.equal( BASE_VAL, base_t['val'] )
+  it( 'distributes all default struct fields to struct objects', function()
+    assert.is.truthy( baseobj.val )
+    assert.are.equal( BASE_VAL, baseobj.val )
   end )
 
-  it( 'distributes all fields to struct instances', function()
-    for _, field in ipairs( getfields(base_t) ) do
-      assert.is.truthy( baseobj[field] )
-    end
+  it( 'distributes all extra struct fields to struct objects', function()
+    assert.is.truthy( baseobj.getval )
+    assert.is.truthy( baseobj.getname )
   end )
 
-  it( 'distributes the same fields to all struct instances', function()
+  it( 'distributes the same fields (default/extra) to all struct objects', function()
     local baseobj2 = base_t()
     for _, field in ipairs( getfields(base_t) ) do
-      assert.are.equal( base_t[field], baseobj[field] )
-      assert.are.equal( base_t[field], baseobj2[field] )
+      assert.are.equal( baseobj[field], baseobj2[field] )
     end
   end )
 
-  it( 'allows instances to use their structs fields', function()
-    assert.are.equal( BASE_VAL, baseobj:getval() )
-    assert.are.equal( BASE_NAME, baseobj:getname() )
+  it( 'distributes same the extra field overrides to all struct object', function()
+    local baseobj2 = base_t()
+    for fieldname, field in ipairs( getfields(base_t) ) do
+      base_t[fieldname] = 0
+      assert.are.equal( base_t[fieldname], baseobj[fieldname] )
+      assert.are.equal( base_t[fieldname], baseobj2[fieldname] )
+    end
   end )
 
-  it( 'disallows accesses to undefined fields in the struct', function()
-    assert.is.equal( nil, baseobj['undefined'] )
+  it( 'supports struct object local overrides that do not impact other objects', function()
+    local baseobj2 = base_t()
+    baseobj.val = 10
+    baseobj2.getval = function( self ) return self.val + 1 end
+
+    assert.are_not.equal( baseobj2.val, baseobj.val )
+    assert.are_not.equal( baseobj.getval, baseobj2.getval )
+
+    assert.are.equal( 10, baseobj:getval() )
+    assert.are.equal( BASE_VAL + 1, baseobj2:getval() )
+  end )
+
+  it( 'supports default field overrides in struct objects w/ overrides occuring ' ..
+      'in field specification order', function()
+    local OVER_BASE_VAL, OVER_OVER_VAL = 10, 20
+    local defs_t = struct( {}, 'base', BASE_VAL, 'over', OVER_VAL )
+    local defsobj = defs_t( OVER_BASE_VAL, OVER_OVER_VAL )
+
+    assert.are.equal( BASE_VAL, defs_t.base )
+    assert.are.equal( OVER_VAL, defs_t.over )
+
+    assert.are.equal( OVER_BASE_VAL, defsobj.base )
+    assert.are.equal( OVER_OVER_VAL, defsobj.over )
+  end )
+
+  it( 'supports granular default initialization specification through the ' ..
+      'definition of the "_init" function', function()
+    local OVER_BASE_VAL, OVER_OVER_VAL = 10, 20
+    local defs_t = struct( {}, 'base', BASE_VAL, 'over', OVER_VAL )
+    defs_t._init = function( self, overval, baseval )
+      self.base, self.over = baseval, overval
+    end
+    local defsobj = defs_t( OVER_OVER_VAL, OVER_BASE_VAL )
+
+    assert.are.equal( BASE_VAL, defs_t.base )
+    assert.are.equal( OVER_VAL, defs_t.over )
+
+    assert.are.equal( OVER_BASE_VAL, defsobj.base )
+    assert.are.equal( OVER_OVER_VAL, defsobj.over )
   end )
 
   it( 'distributes all nonoverridden fields to derived structs', function()
-    desc_t = struct( {base_t} )
-
+    local desc_t = struct( {base_t} )
     for _, field in ipairs( getfields(desc_t) ) do
       assert.are.equal( base_t[field], desc_t[field] )
     end
