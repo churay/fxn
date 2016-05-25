@@ -41,7 +41,7 @@ specs : $(wildcard $(LUA_DIR)/*.lua) $(wildcard $(TEST_DIR)/*.lua)
 %_spec : $(TEST_DIR)/%_spec.lua
 	$(LUA_TESTER) $(LUA_TESTER_FLAGS) --pattern='$(basename $(<F))' $(TEST_DIR)
 
-$(BIN_DIR) $(ETC_DIR) :
+$(BIN_DIR) $(OPT_DIR) :
 	mkdir $@
 
 clean :
