@@ -31,11 +31,11 @@ describe( 'struct', function()
   --[[ Set Up / Tear Down Functions ]]--
 
   before_each( function()
-    base_t = struct( {val=BASE_VAL} )
+    base_t = struct( {}, 'val', BASE_VAL )
     base_t.getval = function( self ) return self.val end
     base_t.getname = function( self ) return BASE_NAME end
 
-    over_t = struct( {val=OVER_VAL}, base_t )
+    over_t = struct( {base_t}, 'val', OVER_VAL )
     over_t.getval = function( self ) return self.val end
     over_t.getname = function( self ) return OVER_NAME end
 
@@ -74,7 +74,7 @@ describe( 'struct', function()
   end )
 
   it( 'distributes all nonoverridden fields to derived structs', function()
-    desc_t = struct( nil, base_t )
+    desc_t = struct( {base_t} )
 
     for _, field in ipairs( getfields(desc_t) ) do
       assert.are.equal( base_t[field], desc_t[field] )
@@ -91,9 +91,9 @@ describe( 'struct', function()
   end )
 
   it( 'supports field distribution from multiple specified base structs', function()
-    local orth_t = struct( {data=OVER_VAL} )
-    orth_t.gettype = function( self ) return 'basealt_t' end
-    local multi_t = struct( nil, base_t, orth_t )
+    local orth_t = struct( {}, 'data', OVER_VAL )
+    orth_t.gettype = function( self ) return 'orth_t' end
+    local multi_t = struct( {base_t, orth_t} )
 
     for _, field in ipairs( getfields(base_t) ) do
       assert.are.equal( base_t[field], multi_t[field] )
@@ -105,10 +105,10 @@ describe( 'struct', function()
 
   it( 'distributes fields to derived structs with field priority being ' ..
       'taken in struct specification order', function()
-    local basealt_t = struct( {val=OVER_VAL} )
+    local basealt_t = struct( {}, 'val', OVER_VAL )
     basealt_t.gettype = function( self ) return 'basealt_t' end
     basealt_t.getname = function( self ) return OVER_NAME end
-    local complex_t = struct( nil, base_t, basealt_t )
+    local complex_t = struct( {base_t, basealt_t} )
 
     for _, field in ipairs( getfields(base_t) ) do
       assert.are.equal( base_t[field], complex_t[field] )
