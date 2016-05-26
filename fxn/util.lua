@@ -57,10 +57,12 @@ function util.copy( orig, copymt, _copied )
   if type( orig ) ~= 'table' then return orig end
   if _copied and _copied[orig] then return _copied[orig] end
 
-  local c = _copied or {}
+  local copied = _copied or {}
   local copy = copymt and setmetatable( {}, getmetatable(orig) ) or {}
-  c[orig] = copy
-  for k, v in pairs( orig ) do copy[util.copy(k, c)] = util.copy( v, c ) end
+  copied[orig] = copy
+  for ok, ov in pairs( orig ) do
+    copy[util.copy(ok, copymt, copied)] = util.copy( ov, copymt, copied )
+  end
 
   return copy
 end
