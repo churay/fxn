@@ -53,6 +53,18 @@ function util.reduce( l, facc, v0 )
   return vacc
 end
 
+function util.copy( orig, copymt, _copied )
+  if type( orig ) ~= 'table' then return orig end
+  if _copied and _copied[orig] then return _copied[orig] end
+
+  local c = _copied or {}
+  local copy = copymt and setmetatable( {}, getmetatable(orig) ) or {}
+  c[orig] = copy
+  for k, v in pairs( orig ) do copy[util.copy(k, c)] = util.copy( v, c ) end
+
+  return copy
+end
+
 function util.len( l )
   local len = 0
   for _ in pairs( l ) do len = len + 1 end
