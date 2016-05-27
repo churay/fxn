@@ -48,31 +48,31 @@ describe( 'util', function()
     end )
 
     it( 'returns the same value for values inclusive to the range', function()
-      assert.are.same( 1.0, util.clamp(1.0, stdmin, stdmax) )
-      assert.are.same( 9.0, util.clamp(9.0, stdmin, stdmax) )
+      assert.are.equal( 1.0, util.clamp(1.0, stdmin, stdmax) )
+      assert.are.equal( 9.0, util.clamp(9.0, stdmin, stdmax) )
 
-      assert.are.same( -5.0e-7, util.clamp(-5.0e-7, strsmin, strsmax) )
-      assert.are.same( 5.0e-7, util.clamp(5.0e-7, strsmin, strsmax) )
+      assert.are.equal( -5.0e-7, util.clamp(-5.0e-7, strsmin, strsmax) )
+      assert.are.equal( 5.0e-7, util.clamp(5.0e-7, strsmin, strsmax) )
     end )
 
     it( 'returns the range maximum for inputs above the maximum', function()
-      assert.are.same( stdmax, util.clamp(stdmax, stdmin, stdmax) )
-      assert.are.same( stdmax, util.clamp(stdmax + 1.0e-6, stdmin, stdmax) )
-      assert.are.same( stdmax, util.clamp(stdmax + 1.0e6, stdmin, stdmax) )
+      assert.are.equal( stdmax, util.clamp(stdmax, stdmin, stdmax) )
+      assert.are.equal( stdmax, util.clamp(stdmax + 1.0e-6, stdmin, stdmax) )
+      assert.are.equal( stdmax, util.clamp(stdmax + 1.0e6, stdmin, stdmax) )
 
-      assert.are.same( strsmax, util.clamp(strsmax, strsmin, strsmax) )
-      assert.are.same( strsmax, util.clamp(strsmax + 1.0e-6, strsmin, strsmax) )
-      assert.are.same( strsmax, util.clamp(strsmax + 1.0e6, strsmin, strsmax) )
+      assert.are.equal( strsmax, util.clamp(strsmax, strsmin, strsmax) )
+      assert.are.equal( strsmax, util.clamp(strsmax + 1.0e-6, strsmin, strsmax) )
+      assert.are.equal( strsmax, util.clamp(strsmax + 1.0e6, strsmin, strsmax) )
     end )
 
     it( 'returns the range minimum for inputs below the minimum', function()
-      assert.are.same( stdmin, util.clamp(stdmin, stdmin, stdmax) )
-      assert.are.same( stdmin, util.clamp(stdmin - 1.0e-6, stdmin, stdmax) )
-      assert.are.same( stdmin, util.clamp(stdmin - 1.0e6, stdmin, stdmax) )
+      assert.are.equal( stdmin, util.clamp(stdmin, stdmin, stdmax) )
+      assert.are.equal( stdmin, util.clamp(stdmin - 1.0e-6, stdmin, stdmax) )
+      assert.are.equal( stdmin, util.clamp(stdmin - 1.0e6, stdmin, stdmax) )
 
-      assert.are.same( strsmin, util.clamp(strsmin, strsmin, strsmax) )
-      assert.are.same( strsmin, util.clamp(strsmin - 1.0e-6, strsmin, strsmax) )
-      assert.are.same( strsmin, util.clamp(strsmin - 1.0e6, strsmin, strsmax) )
+      assert.are.equal( strsmin, util.clamp(strsmin, strsmin, strsmax) )
+      assert.are.equal( strsmin, util.clamp(strsmin - 1.0e-6, strsmin, strsmax) )
+      assert.are.equal( strsmin, util.clamp(strsmin - 1.0e6, strsmin, strsmax) )
     end )
   end )
 
@@ -153,6 +153,40 @@ describe( 'util', function()
       assert.are.equal( 1, util.len({one=1}) )
       assert.are.equal( 3, util.len({1, 2, 3}) )
       assert.are.equal( 3, util.len({one=1, two=2, three=3}) )
+    end )
+  end )
+
+  describe( 'copy', function()
+    it( 'can create independent copies of non-table types', function()
+      local teststr = 'test'
+      local copystr = util.copy( teststr )
+      assert.are.equal( teststr, copystr )
+
+      local testfxn = function() return 'test' end
+      local copyfxn = util.copy( testfxn )
+      assert.are.equal( testfxn, copyfxn )
+    end )
+
+    it( 'can create independent copies of shallow (depth 1) tables', function()
+      local shallowtable = { 300, 'test', false, function() return 1.0 end }
+      local copytable = util.copy( shallowtable )
+      assert.are.same( shallowtable, copytable )
+      assert.are_not.equal( shallowtable, copytable )
+    end )
+
+    it( 'can create independent copies of deep tables', function()
+      local deeptable = { 'test', {300, false}, {true, {13.37, 'leet'}, 'more'} }
+      local copytable = util.copy( deeptable )
+      assert.are.same( deeptable, copytable )
+      assert.are_not.equal( deeptable, copytable )
+    end )
+
+    it( 'can create independent copies of tables that have metatables', function()
+      pending( 'TODO(JRC)' )
+    end )
+
+    it( 'can create independent copies of tables that have memory cycles', function()
+      pending( 'TODO(JRC)' )
     end )
   end )
 end )
