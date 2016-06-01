@@ -1,41 +1,53 @@
 local util = require( 'util' )
 
+-- Struct Rules:
+-- Distribute copies of all default fields (per-instance fields).
+-- Allow overriding of extra fields, but do not allow for overrides.
+--
+-- Struct Function Override Order:
+-- 1. Local Object
+-- 2. Struct for Local Object (Metatable)
+-- 3. Parent Struct of Struct
+--   3+N. Nth Listed Parent Struct of Struct
 local function struct( basestructs, ... )
-  local newstruct, newstructmt = {}, {__fields = {}}
+  local newstruct, newstructmt = { __fields = {}, __fieldnames = {} }, {}
+  local structfields = ... and { ... } or {}
 
   local basestructs = basestructs or {}
-  for sidx = #basestructs, 1, -1 do
-    local basestruct = util.copy( basestructs[sidx] )
-    for sk, sv in pairs( basestruct ) do newstruct[sk] = sv end
+  table.insert( basestructs, 1, newstruct )
+
+  for fidx = 1, #structfields-1, 2 do
+    local fname, fval = structfields[fidx+0], structfields[fidx+1]
+    if type( fname ) ~= 'string' then return nil end
+
+    newstruct.__fields[fname] = fval
+    newstruct.__fieldnames[( fidx + 1 ) / 2] = fname
   end
 
-  local basefields = ... and { ... } or {}
-  for bfidx = 1, #basefields - 1, 2 do
-    local bfname, bfval = basefields[bfidx+0], basefields[bfidx+1]
-    table.insert( newstructmt.__fields, bfname )
-    newstruct[bfname] = util.copy( bfval )
+  newstruct.__index = function( _, key )
+    for bsidx = 1, #basestructs do
+      if basestructs[bsidx][key] ~= nil then return basestructs[bsidx][key] end
+    end
   end
 
-  newstruct.__index = newstruct
   newstructmt.__call = function( newstruct_t, ... )
     local objtable = setmetatable( {}, newstruct )
+    local objfields = ... and { ... } or {}
 
-    if objtable._init ~= nil then
-      objtable:_init( ... )
-    else
-      local overfields = ... and { ... } or {}
-      for fidx = 1, math.min(#overfields, #newstructmt.__fields) do
-        local fname = newstructmt.__fields[fidx]
-        objtable[fname] = overfields[fidx]
+    for bsidx = 1, #basestructs do
+      for fname, fval in pairs( basestructs[bsidx].__fields ) do
+        if objtable[fname] == nil then objtable[fname] = util.copy( fval ) end
       end
+    end
+
+    for fidx = 1, math.min(#overfields, #newstruct.__fields) do
+      objtable[newstruct.__fieldnames[fidx]] = overfields[fidx]
     end
 
     return objtable
   end
 
-  setmetatable( newstruct, newstructmt )
-
-  return newstruct
+  return setmetatable( newstruct, newstructmt )
 end
 
 return struct
