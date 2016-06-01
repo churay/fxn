@@ -54,22 +54,18 @@ describe( 'graph', function()
     assert.are.equallists( {}, emptygraph:queryedges() )
   end )
 
-  --[[
-
   it( 'properly adds nodes to the data structure', function()
-    assert.are.equivalentlists( testnodes, testgraph:querynodes() )
+    assert.are.equallists( testnodes, testgraph:querynodes() )
 
     for nodeidx, node in ipairs( testnodes ) do
-      assert.is_true( vertex:isa(graph.Vertex) )
       assert.are.equal( tostring(nodeidx), node:getlabel() )
     end
   end )
 
   it( 'properly adds new edges to the data structure', function()
-    assert.are.equivalentlists( testedges, testgraph:queryedges() )
+    assert.are.equallists( testedges, testgraph:queryedges() )
 
     for edgeidx, edge in ipairs( testedges ) do
-      assert.is_true( edge:isa(graph.Edge) )
       assert.are.equal(
         edge:getsource():getlabel() .. '>' .. edge:getdestination():getlabel(),
         edge:getlabel()
@@ -82,7 +78,7 @@ describe( 'graph', function()
     assert.falsy( testgraph:addedge(testnodes[1], remotenodes[2]) )
     assert.falsy( testgraph:addedge(remotenodes[1], testnodes[2]) )
 
-    assert.are.equivalentlists( testedges, testgraph:queryedges() )
+    assert.are.equallists( testedges, testgraph:queryedges() )
   end )
 
   it( 'overwrites existing edges on edge readd', function()
@@ -105,12 +101,12 @@ describe( 'graph', function()
       table.remove( testnodes, testnodeidx )
       testgraph:removenode( testnode )
 
-      assert.are.equivalentlists( testnodes, testgraph:querynodes() )
+      assert.are.equallists( testnodes, testgraph:querynodes() )
     end
   end )
 
   it( 'removes all edges attached to a node upon its removal', function()
-    local edgegraph = graph()
+    local edgegraph = graph_t()
 
     local centralnode = edgegraph:addnode( 'c' )
     local outernodes = {}
@@ -134,7 +130,7 @@ describe( 'graph', function()
       table.remove( testedges, testedgeidx )
       testgraph:removeedge( testedge )
 
-      assert.are.equivalentlists( testedges, testgraph:queryedges() )
+      assert.are.equallists( testedges, testgraph:queryedges() )
     end
   end )
 
@@ -169,13 +165,13 @@ describe( 'graph', function()
     assert.falsy( testgraph:findedge(remotenodes[1], remotenodes[2]) )
   end )
 
-  it( 'facilitates arbitrary node queries with 'querynodes'', function()
+  it( 'facilitates arbitrary node queries with "querynodes"', function()
     local queriednodes = testgraph:querynodes( function(v)
       return tonumber( v:getlabel() ) >= 3
     end )
 
     assert.are.equal( 3, #queriednodes )
-    assert.are.equivalentlists(
+    assert.are.equallists(
       { testnodes[3], testnodes[4], testnodes[5] },
       queriednodes
     )
@@ -187,7 +183,6 @@ describe( 'graph', function()
     end )
 
     assert.are.equal( 2, #queriededges )
-    assert.are.equivalentlists( {testedges[3], testedges[4]}, queriededges )
+    assert.are.equallists( {testedges[3], testedges[4]}, queriededges )
   end )
-  ]]--
 end )
