@@ -40,8 +40,12 @@ local function struct( basestructs, ... )
       end
     end
 
-    for fidx = 1, math.min(#overfields, #newstruct.__fields) do
-      objtable[newstruct.__fieldnames[fidx]] = overfields[fidx]
+    if objtable._init ~= nil then
+      objtable:_init( ... )
+    else
+      for fidx = 1, math.min( #objfields, #newstruct.__fieldnames ) do
+        objtable[newstruct.__fieldnames[fidx]] = objfields[fidx]
+      end
     end
 
     return objtable
