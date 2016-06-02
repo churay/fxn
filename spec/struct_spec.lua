@@ -158,12 +158,7 @@ describe( 'struct', function()
 
     it( 'distributes all nonoverridden object fields to derived structs', function()
       for _, ofield in ipairs( getobjfields(base_t) ) do
-        local isoverridden = false
-        for _, overofield in ipairs( getobjfields(over_t) ) do
-          isoverridden = isoverridden or ofield == overofield
-        end
-
-        if not isoverridden then
+        if over_t.__fields[ofield] == nil then
           assert.are.same( base_t.__fields[ofield], overobj[ofield] )
         end
       end
@@ -171,12 +166,7 @@ describe( 'struct', function()
 
     it( 'distributes all nonoverridden shared fields to derived structs', function()
       for _, sfield in ipairs( getshrfields(base_t) ) do
-        local isoverridden = false
-        for _, oversfield in ipairs( getshrfields(over_t) ) do
-          isoverridden = isoverridden or sfield == oversfield
-        end
-
-        if not isoverridden then
+        if over_t[sfield] == nil then
           assert.are.equal( base_t[sfield], overobj[sfield] )
         end
       end
@@ -195,41 +185,42 @@ describe( 'struct', function()
     end )
 
     it( 'supports field distribution from multiple specified base structs', function()
-      pending( 'TODO(JRC)' )
-      --[[
       local orth_t = struct( {}, 'data', OVER_VAL )
       orth_t.gettype = function( self ) return 'orth_t' end
-      local multi_t = struct( {base_t, orth_t} )
 
-      for _, field in ipairs( getfields(base_t) ) do
-        assert.are.equal( base_t[field], multi_t[field] )
+      local multi_t = struct( {base_t, orth_t} )
+      local multiobj = multi_t()
+
+      for _, ofield in ipairs( getobjfields(base_t) ) do
+        assert.are.same( base_t.__fields[ofield], multiobj[ofield] )
       end
-      for _, field in ipairs( getfields(orth_t) ) do
-        assert.are.equal( orth_t[field], multi_t[field] )
+      for _, sfield in ipairs( getshrfields(base_t) ) do
+        assert.are.equal( base_t[sfield], multiobj[sfield] )
       end
-      --]]
+
+      for _, ofield in ipairs( getobjfields(orth_t) ) do
+        assert.are.same( orth_t.__fields[ofield], multiobj[ofield] )
+      end
+      for _, sfield in ipairs( getshrfields(orth_t) ) do
+        assert.are.equal( orth_t[sfield], multiobj[sfield] )
+      end
     end )
 
     it( 'distributes fields to derived structs with field priority being ' ..
         'taken in struct specification order', function()
-      pending( 'TODO(JRC)' )
-      --[[
-      local basealt_t = struct( {}, 'val', OVER_VAL )
-      basealt_t.gettype = function( self ) return 'basealt_t' end
-      basealt_t.getname = function( self ) return OVER_NAME end
-      local complex_t = struct( {base_t, basealt_t} )
+      local complex_t = struct( {base_t, over_t} )
+      local complexobj = complex_t()
 
-      for _, field in ipairs( getfields(base_t) ) do
-        assert.are.equal( base_t[field], complex_t[field] )
+      for _, sfield in ipairs( getshrfields(base_t) ) do
+        assert.are.equal( base_t[sfield], complexobj[sfield] )
       end
-      for _, field in ipairs( getfields(basealt_t) ) do
-        if not base_t[field] then
-          assert.are.equal( basealt_t[field], complex_t[field] )
+      for _, sfield in ipairs( getshrfields(over_t) ) do
+        if base_t[sfield] == nil then
+          assert.are.equal( over_t[sfield], complexobj[sfield] )
         else
-          assert.are_not.equal( basealt_t[field], complex_t[field] )
+          assert.are_not.equal( over_t[sfield], complexobj[sfield] )
         end
       end
-      --]]
     end )
   end )
 end )
