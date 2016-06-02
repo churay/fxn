@@ -23,8 +23,9 @@ function graph_t.addnode( self, nlabel )
   return graph_t.node_t( self, nid )
 end
 
--- TODO(JRC): Add an option for adding bidirectional edges.
-function graph_t.addedge( self, srcnode, dstnode, elabel )
+function graph_t.addedge( self, srcnode, dstnode, elabel, bielabel )
+  if bielabel ~= nil then self:addedge( dstnode, srcnode, bielabel ) end
+
   if self:findnode( srcnode ) and self:findnode( dstnode ) then
     if self:findedge( srcnode, dstnode ) then
       self:removeedge( srcnode, dstnode )
