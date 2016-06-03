@@ -1,11 +1,6 @@
 local struct = require( 'struct' )
-local util = require( 'util' )
-
---[[ Constructor ]]--
 
 local vector_t = struct( {}, 'x', 0.0, 'y', 0.0 )
-
---[[ Operator Overloads ]]--
 
 function vector_t.__add( self, vector )
   return vector_t( self.x + vector.x, self.y + vector.y )
@@ -35,8 +30,6 @@ function vector_t.__tostring( self )
   return "vec( " .. self.x .. ", " .. self.y .. " )"
 end
 
---[[ Public Functions ]]--
-
 function vector_t.dot( self, vector )
   return self.x * vector.x + self.y * vector.y
 end
@@ -57,8 +50,8 @@ function vector_t.normalize( self )
   self.y = self.y / magnitude
 end
 
---[[ Accessor Functions ]]--
-
-function vector_t.xy( self ) return self.x, self.y end
+function vector_t.xy( self )
+  return self.x, self.y
+end
 
 return vector_t

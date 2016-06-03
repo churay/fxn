@@ -1,6 +1,5 @@
 require( 'bustedext' )
 local util = require( 'fxn.util' )
-local dbg = require( 'debugger' )
 
 describe( 'util', function()
   --[[ Testing Functions ]]--
