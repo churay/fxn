@@ -1,5 +1,3 @@
-package.path = package.path .. ';fxn/?.lua;opt/?.lua'
-
 local fxn = require( 'fxn' )
 -- local dbg = require( 'debugger' )
 

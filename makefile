@@ -1,9 +1,12 @@
 ### Compilation/Linking Tools and Flags ###
 
-LUA_RUNNER = love
+LUA_PPATH = $(LUA_PATH);$(LUA_DIR)/?.lua;$(OPT_DIR)/?.lua
+LUA_TPATH = $(LUA_PPATH);$(TEST_DIR)/?.lua
+
+LUA_RUNNER = env LUA_PATH='$(LUA_PPATH)' love
 LUA_RUNNER_FLAGS =
 LUA_TESTER = busted
-LUA_TESTER_FLAGS = --lpath='$(LUA_DIR)/?.lua;$(OPT_DIR)/?.lua;$(TEST_DIR)/?.lua'
+LUA_TESTER_FLAGS = --lpath='$(LUA_TPATH)'
 
 ### Project Files and Directories ###
 
