@@ -1,7 +1,7 @@
 require( 'bustedext' )
-local fxn_t = require( 'fxn.fxn' )
+local fxn_t = require( 'fxn.func' )
 
-describe( 'fxn', function()
+describe( 'func', function()
   --[[ Testing Constants ]]--
 
   -- TODO(JRC)

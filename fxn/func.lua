@@ -19,7 +19,7 @@ local struct = require( 'struct' )
 --  - f_1: the first function that comprises the new function
 --  - f_n: the nth function that comprises the new function
 
-local fxn_t = struct( {}, '_fxn', function(x) return 0 end )
+local func_t = struct( {}, '_fxn', function(x) return 0 end )
 
 --[[
 function fxn_t.__add( self, other )
@@ -36,4 +36,4 @@ function fxn_t.__mul( self, other )
 end
 ]]--
 
-return fxn_t
+return func_t
