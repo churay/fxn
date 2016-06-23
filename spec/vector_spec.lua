@@ -4,45 +4,43 @@ local vector_t = require( 'fxn.vector' )
 describe( 'vector', function()
   --[[ Testing Constants ]]--
 
-  local TEST_VECTOR_X = 1
-  local TEST_VECTOR_Y = 2
+  local TEST_VECTOR_X = 3
+  local TEST_VECTOR_Y = 4
 
   --[[ Testing Variables ]]--
 
   local testvector = nil
+  local zerovector = nil
 
   --[[ Set Up / Tear Down Functions ]]--
 
   before_each( function()
     testvector = vector_t( TEST_VECTOR_X, TEST_VECTOR_Y )
-  end )
-
-  after_each( function()
-    testvector = nil
+    zerovector = vector_t( 0, 0 )
   end )
 
   --[[ Testing Functions ]]--
 
-  it( 'constructor initializes vector components', function()
+  it( 'initializes its component values to arguments in (x, y) order', function()
     assert.are.equal( TEST_VECTOR_X, testvector.x )
     assert.are.equal( TEST_VECTOR_Y, testvector.y )
   end )
 
-  it( 'add operator properly adds vectors', function()
+  it( 'supports vector addition', function()
     local addvector = testvector + testvector
 
     assert.are.equal( 2*TEST_VECTOR_X, addvector.x )
     assert.are.equal( 2*TEST_VECTOR_Y, addvector.y )
   end )
 
-  it( 'subtraction operator properly subtracts vectors', function()
+  it( 'supports vector subtraction', function()
     local subvector = testvector - testvector
 
     assert.are.equal( 0, subvector.x )
     assert.are.equal( 0, subvector.y )
   end )
 
-  it( 'multiplication operator supports scalar multiplication', function()
+  it( 'supports scalar multiplication', function()
     local mulscalar = 10.0
 
     local mulvector = mulscalar * testvector
@@ -54,14 +52,14 @@ describe( 'vector', function()
     assert.are.equal( mulscalar*TEST_VECTOR_Y, revmulvector.y )
   end )
 
-  it( 'unary subtraction operator properly inverts vectors', function()
+  it( 'supports vector unary negation', function()
     local negvector = -testvector
 
     assert.are.equal( -1*TEST_VECTOR_X, negvector.x )
     assert.are.equal( -1*TEST_VECTOR_Y, negvector.y )
   end )
 
-  it( 'equality operator only returns true for like vectors', function()
+  it( 'supports the equality operator', function()
     local diffvector = vector_t( TEST_VECTOR_Y, TEST_VECTOR_X )
     local equivvector = vector_t( TEST_VECTOR_X, TEST_VECTOR_Y )
 
@@ -70,24 +68,43 @@ describe( 'vector', function()
     assert.are_not.equal( diffvector, testvector )
   end )
 
-  it( 'angle operator returns the proper angle between vectors', function()
+  it( 'implements the vector dot product operation', function()
+    local zerodot = testvector:dot(zerovector)
+    assert.are.equaly( 0, zerodot )
+
+    local testdot = testvector:dot(testvector)
+    assert.are.equaly( TEST_VECTOR_X^2 + TEST_VECTOR_Y^2, testdot )
+  end )
+
+  it( 'implements the vector magnitude operation', function()
+    assert.are.equaly( 0, zerovector:magnitude() )
+    assert.are.equaly( 5, testvector:magnitude() )
+  end )
+
+  it( 'implements the vector normalization operation', function()
+    local normvector = testvector:normalize()
+    assert.are.equaly( 3/5, normvector.x )
+    assert.are.equaly( 4/5, normvector.y )
+
+    local normvector2 = vector_t( 10, 0 ):normalize()
+    assert.are.equaly( 1, normvector2.x )
+    assert.are.equaly( 0, normvector2.y )
+  end )
+
+  it( 'implements the vector angle between operation', function()
     assert.are.equaly( 0, testvector:angleto(testvector) )
+
+    assert.are.equaly( 0, vector_t(1, 0):angleto(vector_t(1, 0)) )
     assert.are.equaly( math.pi/2, vector_t(1, 0):angleto(vector_t(0, 1)) )
     assert.are.equaly( math.pi, vector_t(1, 0):angleto(vector_t(-1, 0)) )
     assert.are.equaly( math.pi/2, vector_t(1, 0):angleto(vector_t(0, -1)) )
   end )
 
-  it( 'normalize properly turns vector to a unit equivalent', function()
-    local hugevector = vector_t( 10, 0 )
-    hugevector:normalize()
-    assert.are.equal( 1, hugevector.x )
-    assert.are.equal( 0, hugevector.y )
-    assert.are.equal( 1, hugevector:magnitude() )
+  it( 'implements the vector projection operation', function()
+    assert.are.equal( zerovector, zerovector:projonto(testvector) )
+    assert.are.equal( testvector, testvector:projonto(testvector) )
 
-    local enormousvector = vector_t( 300, 300 )
-    enormousvector:normalize()
-    assert.are.equaly( math.sqrt(2)/2, enormousvector.x )
-    assert.are.equaly( math.sqrt(2)/2, enormousvector.y )
-    assert.are.equaly( 1, enormousvector:magnitude() )
+    assert.are.equal( vector_t(TEST_VECTOR_X, 0), testvector:projonto(vector_t(1, 0)) )
+    assert.are.equal( vector_t(0, TEST_VECTOR_Y), testvector:projonto(vector_t(0, 1)) )
   end )
 end )
