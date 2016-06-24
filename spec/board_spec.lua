@@ -1,7 +1,7 @@
 require( 'bustedext' )
-local board_t = require( 'fxn.board' )
+local board_t = require( 'fxn.board_t' )
 
-describe( 'board', function()
+describe( 'board_t', function()
   --[[ Testing Constants ]]--
 
   -- TODO(JRC)

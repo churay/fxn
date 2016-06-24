@@ -1,7 +1,7 @@
 require( 'bustedext' )
-local func_t = require( 'fxn.func' )
+local func_t = require( 'fxn.func_t' )
 
-describe( 'func', function()
+describe( 'func_t', function()
   --[[ Testing Variables ]]--
 
   local fident = nil

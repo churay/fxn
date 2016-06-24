@@ -22,7 +22,7 @@ FXN_LOVE = $(BIN_DIR)/fxn.love
 
 ### Build Rules ###
 
-.PHONY : dist love main tests %_test clean
+.PHONY : dist love main specs %_spec clean
 
 all : main
 

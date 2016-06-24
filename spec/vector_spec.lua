@@ -1,7 +1,7 @@
 require( 'bustedext' )
-local vector_t = require( 'fxn.vector' )
+local vector_t = require( 'fxn.vector_t' )
 
-describe( 'vector', function()
+describe( 'vector_t', function()
   --[[ Testing Constants ]]--
 
   local TEST_VECTOR_X = 3

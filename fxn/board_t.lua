@@ -1,5 +1,5 @@
 local struct = require( 'struct' )
-local graph_t = require( 'graph' )
+local graph_t = require( 'graph_t' )
 
 --[[ Constructor ]]--
 

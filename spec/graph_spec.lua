@@ -1,7 +1,7 @@
 require( 'bustedext' )
-local graph_t = require( 'fxn.graph' )
+local graph_t = require( 'fxn.graph_t' )
 
-describe( 'graph', function()
+describe( 'graph_t', function()
   --[[ Testing Variables ]]--
 
   local testgraph = nil
