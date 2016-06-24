@@ -47,6 +47,10 @@ end
 
 --[[ Operators ]]--
 
+function func_t.__call( self, x )
+  return self._fxn( x, util.unpack(self._sfxns) )
+end
+
 function func_t.__add( self, other )
   return func_t( func_t.binop(function(v1, v2) return v1 + v2 end), self, other )
 end
@@ -62,14 +66,6 @@ end
 function func_t.__div( self, other )
   return func_t( func_t.binop(function(v1, v2) return v1 / v2 end), self, other )
 end
-
--- TODO(JRC): Figure out how to best override the '__call' metafunction to
--- make evaluation as simple as possible.
---[[
-function func_t.__call( self, x )
-  return self._fxn( x, util.unpack(self._sfxns) )
-end
---]]
 
 --[[ Public Functions ]]--
 
