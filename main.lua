@@ -61,11 +61,46 @@ function love.draw()
   end
 
   do -- plot example function
+    -- TODO(JRC): Adjust the number of sampling points based on the
+    -- dimensions of the rendering window (fewer points for smaller space).
+    local plsamplenum = 20
+    -- TODO(JRC): Figure out what the actual values for the sample
+    -- range of the graph will be (min must be related to turn offset,
+    -- max must be related to maximum lookahead).
+    local plsamplemin, plsamplemax = 0, 2 * math.pi
+    -- TODO(JRC): Find the maximum and minimum bounds for the plot
+    -- by taking the function derivatives and finding their zero points.
+    local plresultmin, plresultmax = -1.0, 1.0
+
+    local ploriginx, ploriginy = 1e-1, 0e0
+    local plpad = 3e-2
+    local plscalex = ( 1.0 - ploriginx - plpad ) * 1.0 / ( plsamplemax - plsamplemin )
+    local plscaley = ( 1.0 - 2.0*plpad ) * 1.0 / ( plresultmax - plresultmin )
+
     love.graphics.setColor( unpack(fxn.colors.black) )
     love.graphics.setLineWidth( 0.01 )
 
     love.graphics.translate( 0.0, 0.5 )
-    love.graphics.line( 0.01, 0.0, 0.99, 0.0 )
+    do     -- plot axes
+      love.graphics.line( 0.0+plpad, 0.0, 1.0-plpad, 0.0 )
+      love.graphics.line( ploriginx, -0.5+plpad, ploriginx, 0.5-plpad )
+      love.graphics.translate( ploriginx, ploriginy )
+      love.graphics.scale( plscalex, plscaley )
+    end do -- plot ticks
+      -- TODO(JRC)
+    end do -- plot function
+      local samples = {}
+      for sidx = 1, plsamplenum do
+        local sratio = ( sidx - 1 ) / ( plsamplenum - 1 )
+        local sx = plsamplemin + ( plsamplemax - plsamplemin ) * sratio
+        local sy = func( sx )
+        table.insert( samples, sx ); table.insert( samples, sy )
+      end
+      love.graphics.setColor( unpack(fxn.colors.gray) )
+      love.graphics.line( unpack(samples) )
+    end do -- plot discretized function
+      -- TODO(JRC)
+    end
   end
 
   love.graphics.pop()
