@@ -1,4 +1,5 @@
 local fxn = require( 'fxn' )
+-- local love.ext = require( 'loveext' )
 -- local dbg = require( 'debugger' )
 
 local func = nil
@@ -63,7 +64,7 @@ function love.draw()
   do -- plot example function
     -- TODO(JRC): Adjust the number of sampling points based on the
     -- dimensions of the rendering window (fewer points for smaller space).
-    local plsamplenum = 20
+    local plsamplenum = 100
     -- TODO(JRC): Figure out what the actual values for the sample
     -- range of the graph will be (min must be related to turn offset,
     -- max must be related to maximum lookahead).
@@ -71,6 +72,8 @@ function love.draw()
     -- TODO(JRC): Find the maximum and minimum bounds for the plot
     -- by taking the function derivatives and finding their zero points.
     local plresultmin, plresultmax = -1.0, 1.0
+    -- TODO(JRC): Consider adjusting these based on the size of the display.
+    local pltickxnum, pltickynum= 10, 10
 
     local ploriginx, ploriginy = 1e-1, 0e0
     local plpad = 3e-2
@@ -84,11 +87,16 @@ function love.draw()
     do     -- plot axes
       love.graphics.line( 0.0+plpad, 0.0, 1.0-plpad, 0.0 )
       love.graphics.line( ploriginx, -0.5+plpad, ploriginx, 0.5-plpad )
+    end do -- plot ticks
+      love.graphics.push()
+      love.graphics.translate( ploriginx, ploriginy )
+
+      love.graphics.pop()
+    end do -- plot function
+      love.graphics.push()
       love.graphics.translate( ploriginx, ploriginy )
       love.graphics.scale( plscalex, plscaley )
-    end do -- plot ticks
-      -- TODO(JRC)
-    end do -- plot function
+
       local samples = {}
       for sidx = 1, plsamplenum do
         local sratio = ( sidx - 1 ) / ( plsamplenum - 1 )
@@ -96,8 +104,10 @@ function love.draw()
         local sy = func( sx )
         table.insert( samples, sx ); table.insert( samples, sy )
       end
-      love.graphics.setColor( unpack(fxn.colors.gray) )
+      love.graphics.setColor( unpack(fxn.colors.dgray) )
       love.graphics.line( unpack(samples) )
+
+      love.graphics.pop()
     end do -- plot discretized function
       -- TODO(JRC)
     end
