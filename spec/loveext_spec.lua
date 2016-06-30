@@ -20,7 +20,9 @@ describe( 'love.ext', function()
       love.graphics[lgoverfxn] = lovestub.graphics[lgoverfxn]
     end
 
-    love.ext = loadfile( 'loveext', 't', {love=love} )
+    -- TODO(JRC): Fix the problems related to using this environment.
+    -- local loveextenv = { love=love, math=math, table=table, pairs=pairs, ipairs=ipairs }
+    -- love.ext = assert(loadfile( 'opt/loveext.lua', 't', loveextenv ))()
   end )
 
   --[[ Testing Functions ]]--
@@ -48,6 +50,52 @@ describe( 'love.ext', function()
         love.graphics[lgoverfxn]( table.unpack(testparams) )
         assert.stub(lovestub.graphics[lgoverfxn]).was_called_with( table.unpack(testparams) )
       end
+    end )
+
+    describe( 'transform tracking', function()
+      it( 'returns an identity matrix from "love.graphics.getTransform" when no' ..
+          'other "love.graphics" functions are called beforehand', function()
+        assert.are.equallists(
+          {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0},
+          love.graphics.getTransform()
+        )
+      end )
+
+      it( 'returns an independent transform from "love.graphics.getTransform" ' ..
+          'that cannot be manipulated to manipulate internal tracking values', function()
+        pending( 'TODO(JRC)' )
+      end )
+
+      it( 'properly adjusts the transform when "love.graphics.rotate" is invoked', function()
+        pending( 'TODO(JRC)' )
+      end )
+
+      it( 'properly adjusts the transform when "love.graphics.scale" is invoked', function()
+        local scalex, scaley = 10, 20
+        love.graphics.scale( scalex, scaley )
+
+        assert.are.equallists(
+          {scalex, 0.0, 0.0, 0.0, scaley, 0.0, 0.0, 0.0, 1.0},
+          love.graphics.getTransform()
+        )
+      end )
+
+      it( 'properly adjusts the transform when "love.graphics.shear" is invoked', function()
+        pending( 'TODO(JRC)' )
+      end )
+
+      it( 'properly adjusts the transform when "love.graphics.translate" is invoked', function()
+        pending( 'TODO(JRC)' )
+      end )
+
+      it( 'resets the transform when "love.graphics.origin" is called', function()
+        pending( 'TODO(JRC)' )
+      end )
+
+      it( 'adjusts the transform following standard stack save/restore behavior when ' ..
+          '"love.graphics.pop" and "love.graphics.push" are called', function()
+        pending( 'TODO(JRC)' )
+      end )
     end )
   end )
 end )
