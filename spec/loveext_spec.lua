@@ -1,4 +1,5 @@
 require( 'bustedext' )
+local ldb = require( 'debugger' )
 
 describe( 'love.ext', function()
   --[[ Testing Constants ]]--
@@ -23,6 +24,13 @@ describe( 'love.ext', function()
     -- TODO(JRC): Fix the problems related to using this environment.
     -- local loveextenv = { love=love, math=math, table=table, pairs=pairs, ipairs=ipairs }
     -- love.ext = assert(loadfile( 'opt/loveext.lua', 't', loveextenv ))()
+    _G['love'] = love
+    love.ext = require( 'loveext' )
+    love, _G['love'] = _G['love'], nil
+  end )
+
+  after_each( function()
+    package.loaded['loveext'] = nil
   end )
 
   --[[ Testing Functions ]]--
@@ -35,6 +43,7 @@ describe( 'love.ext', function()
     end )
 
     it( 'always calls original library functions on calls to overrides', function()
+      ldb()
       for _, lgoverfxn in ipairs( LG_OVERFXNS ) do
         love.graphics[lgoverfxn]()
         assert.stub(lovestub.graphics[lgoverfxn]).was_called( 1 )

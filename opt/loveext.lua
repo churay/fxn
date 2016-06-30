@@ -66,9 +66,11 @@ function lgexts.translate( transx, transy )
 end
 
 for lgfname, lgfext in pairs( lgexts ) do
+  local lgforg = love.graphics[lgfname]
+
   love.graphics[lgfname] = function( ... )
     lgfext( ... )
-    love.graphics[lgfname]( ... )
+    lgforg( ... )
   end
 end
 
