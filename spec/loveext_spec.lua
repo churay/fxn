@@ -21,9 +21,6 @@ describe( 'love.ext', function()
       love.graphics[lgoverfxn] = lovestub.graphics[lgoverfxn]
     end
 
-    -- TODO(JRC): Fix the problems related to using this environment.
-    -- local loveextenv = { love=love, math=math, table=table, pairs=pairs, ipairs=ipairs }
-    -- love.ext = assert(loadfile( 'opt/loveext.lua', 't', loveextenv ))()
     _G['love'] = love
     love.ext = require( 'loveext' )
     love, _G['love'] = _G['love'], nil
@@ -43,7 +40,6 @@ describe( 'love.ext', function()
     end )
 
     it( 'always calls original library functions on calls to overrides', function()
-      ldb()
       for _, lgoverfxn in ipairs( LG_OVERFXNS ) do
         love.graphics[lgoverfxn]()
         assert.stub(lovestub.graphics[lgoverfxn]).was_called( 1 )

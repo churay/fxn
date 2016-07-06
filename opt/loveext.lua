@@ -32,7 +32,7 @@ function lgexts.origin()
 end
 
 function lgexts.pop()
-  lgxform = table.remove( lgstack )
+  if next( lgstack ) then lgxform = table.remove( lgstack ) end
 end
 
 function lgexts.push()
@@ -42,6 +42,7 @@ function lgexts.push()
 end
 
 function lgexts.rotate( angle )
+  local angle = angle or 0.0
   local rotxform = {
     math.cos(angle), -math.sin(angle), 0.0,
     math.sin(angle),  math.cos(angle), 0.0,
@@ -51,16 +52,19 @@ function lgexts.rotate( angle )
 end
 
 function lgexts.scale( scalex, scaley )
+  local scalex, scaley = scalex or 1.0, scaley or 1.0
   local scalexform = { scalex, 0.0, 0.0, 0.0, scaley, 0.0, 0.0, 0.0, 1.0 }
   lgapplyxform( scalexform )
 end
 
 function lgexts.shear( shearx, sheary )
+  local shearx, sheary = shearx or 0.0, sheary or 0.0
   local shearxform = { 1.0, shearx, 0.0, sheary, 1.0, 0.0, 0.0, 0.0, 1.0 }
   lgapplyxform( shearxform )
 end
 
 function lgexts.translate( transx, transy )
+  local transx, transy = transx or 0.0, transy or 0.0
   local transxform = { 0.0, 0.0, transx, 0.0, 0.0, transy, 0.0, 0.0, 1.0 }
   lgapplyxform( transxform )
 end
