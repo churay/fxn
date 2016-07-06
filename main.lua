@@ -1,8 +1,9 @@
 local fxn = require( 'fxn' )
--- local love.ext = require( 'loveext' )
+love.ext = require( 'loveext' )
 -- local dbg = require( 'debugger' )
 
 local func = nil
+local mouse = { x=0, y=0 }
 
 function love.run()
   math.randomseed( os.time() )
@@ -49,7 +50,7 @@ function love.keypressed( key, scancode, isrepeat )
 end
 
 function love.update( dt )
-  
+  mouse.x, mouse.y = love.mouse.getPosition()
 end
 
 function love.draw()
@@ -110,6 +111,16 @@ function love.draw()
       love.graphics.pop()
     end do -- plot discretized function
       -- TODO(JRC)
+    end do -- display plot values at mouse
+      love.graphics.push()
+      love.graphics.translate( ploriginx, ploriginy )
+      love.graphics.scale( plscalex, plscaley )
+
+      -- TODO(JRC)
+      local plmousex, plmousey = love.graphics.transform( mouse.x, mouse.y, true )
+      print( plmousex, plmousey )
+
+      love.graphics.pop()
     end
   end
 

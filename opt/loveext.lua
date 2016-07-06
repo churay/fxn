@@ -5,24 +5,26 @@ local lxt = {}
 local lgstack = {}
 local lgxform = { 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 }
 
-local function getmidx( r, c )
-  return 3 * ( c - 1 ) + r
+local function getmatidx( r, c )
+  return 3 * ( r - 1 ) + c
 end
 
-local function lgapplyxform( xform )
-  local newxform = { 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 }
+local function getmatmult( mlhs, mrhs )
+  local mres = { 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 }
 
   for ridx = 1, 3 do
     for cidx = 1, 3 do
-      local entry = 0
-      for eidx = 1, 3 do
-        entry = entry + lgxform[getmidx(ridx, eidx)] * xform[getmidx(eidx, cidx)]
-      end
-      newxform[getmidx(ridx, cidx)] = entry
+      local e = 0
+      for eidx = 1, 3 do e = e + mlhs[getmatidx(ridx, eidx)] * mrhs[getmatidx(eidx, cidx)] end
+      mres[getmatidx(ridx, cidx)] = e
     end
   end
 
-  lgxform = newxform
+  return mres
+end
+
+local function lgapplyxform( xform )
+  lgxform = getmatmult( lgxform, xform )
 end
 
 local lgexts = {}
@@ -76,6 +78,22 @@ for lgfname, lgfext in pairs( lgexts ) do
     lgfext( ... )
     lgforg( ... )
   end
+end
+
+function love.graphics.transform( posx, posy, invert )
+  local invert = invert or false
+  local vrhs, vres = { posx, posy, 1.0 }, { 0.0, 0.0, 0.0 }
+
+  -- TODO(JRC): Add behavior here to get the inverse transform
+  -- to be applied to the given position.
+
+  for ridx = 1, 3 do
+    local e = 0
+    for eidx = 1, 3 do e = e + lgxform[getmatidx(ridx, eidx)] * vrhs[eidx] end
+    vres[ridx] = e
+  end
+
+  return vres[1], vres[2]
 end
 
 function love.graphics.getTransform()
