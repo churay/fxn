@@ -133,8 +133,6 @@ describe( 'love.ext', function()
 
       it( 'properly applies the inverse transform to the position given to ' ..
           '"love.graphics.transform" when the invert flag is set to true', function()
-        pending( 'TODO(JRC): Implement the functionality for this.' )
-
         local posx, posy = 14, 28
         local transx, transy = 10, 20
 

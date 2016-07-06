@@ -5,8 +5,9 @@ local lxt = {}
 local lgstack = {}
 local lgxform = { 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 }
 
-local function getmatidx( r, c )
-  return 3 * ( r - 1 ) + c
+local function getmatidx( r, c, nc )
+  local nc = nc or 3
+  return nc * ( r - 1 ) + c
 end
 
 local function getmatmult( mlhs, mrhs )
@@ -21,6 +22,64 @@ local function getmatmult( mlhs, mrhs )
   end
 
   return mres
+end
+
+local function getmatinv( mat )
+  local maug = {
+    mat[1], mat[2], mat[3], 1.0, 0.0, 0.0,
+    mat[4], mat[5], mat[6], 0.0, 1.0, 0.0,
+    mat[7], mat[8], mat[9], 0.0, 0.0, 1.0
+  }
+
+  local function getmidx( r, c ) return getmatidx( r, c, 6 ) end
+
+  local function rowswap( row1, row2 )
+    for col = 1, 6 do
+      local eidx1, eidx2 = getmidx( row1, col ), getmidx( row2, col )
+      maug[eidx1], maug[eidx2] = maug[eidx2], maug[eidx1]
+    end
+  end
+
+  local function rowscale( row, scale )
+    for col = 1, 6 do
+      local eidx = getmidx( row, col )
+      maug[eidx] = scale * maug[eidx]
+    end
+  end
+
+  local function rowadd( srow, drow, scale )
+    for col = 1, 6 do
+      local sidx, didx = getmidx( srow, col ), getmidx( drow, col )
+      maug[didx] = maug[didx] + scale * maug[sidx]
+    end
+  end
+
+  for ridx = 1, 3 do
+    local pidx = ridx
+    for kridx = ridx, 3 do
+      if math.abs(maug[getmidx(pidx, ridx, 6)]) < math.abs(maug[getmidx(kridx, ridx)]) then
+        pidx = kridx
+      end
+    end
+    rowswap( pidx, ridx )
+
+    for kridx = ridx, 3 do
+      if kridx ~= ridx then
+        local krscale = -1.0 * maug[getmidx(kridx, ridx)] / maug[getmidx(ridx, ridx)]
+        rowadd( ridx, kridx, krscale )
+        maug[getmidx(kridx, ridx)] = 0.0
+      end
+    end
+
+    local rscale = 1 / maug[getmidx(ridx, ridx)]
+    rowscale( ridx, rscale )
+  end
+
+  return {
+    maug[04], maug[05], maug[06],
+    maug[10], maug[11], maug[12],
+    maug[16], maug[17], maug[18]
+  }
 end
 
 local function lgapplyxform( xform )
@@ -84,12 +143,10 @@ function love.graphics.transform( posx, posy, invert )
   local invert = invert or false
   local vrhs, vres = { posx, posy, 1.0 }, { 0.0, 0.0, 0.0 }
 
-  -- TODO(JRC): Add behavior here to get the inverse transform
-  -- to be applied to the given position.
-
+  local xform = invert and getmatinv( lgxform ) or lgxform
   for ridx = 1, 3 do
     local e = 0
-    for eidx = 1, 3 do e = e + lgxform[getmatidx(ridx, eidx)] * vrhs[eidx] end
+    for eidx = 1, 3 do e = e + xform[getmatidx(ridx, eidx)] * vrhs[eidx] end
     vres[ridx] = e
   end
 
