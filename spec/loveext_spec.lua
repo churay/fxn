@@ -1,5 +1,4 @@
 require( 'bustedext' )
-local ldb = require( 'debugger' )
 
 describe( 'love.ext', function()
   --[[ Testing Constants ]]--
@@ -62,17 +61,35 @@ describe( 'love.ext', function()
           'other "love.graphics" functions are called beforehand', function()
         assert.are.equallists(
           {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0},
-          love.graphics.getTransform()
+          love.graphics.getTransform(), false
         )
       end )
 
       it( 'returns an independent transform from "love.graphics.getTransform" ' ..
           'that cannot be manipulated to manipulate internal tracking values', function()
-        pending( 'TODO(JRC)' )
+        local lgxform = love.graphics.getTransform()
+        for eidx in ipairs( lgxform ) do lgxform[eidx] = 0.0 end
+
+        assert.are.equallists(
+          {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0},
+          love.graphics.getTransform(), false
+        )
       end )
 
       it( 'properly adjusts the transform when "love.graphics.rotate" is invoked', function()
-        pending( 'TODO(JRC)' )
+        pending( 'TODO(JRC): Add support for "equaly" in lists.' )
+
+        love.graphics.rotate( math.pi / 2.0 )
+        assert.are.equallists(
+          {0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0},
+          love.graphics.getTransform(), false
+        )
+
+        love.graphics.rotate( math.pi / 2.0 )
+        assert.are.equallists(
+          {-1.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0},
+          love.graphics.getTransform(), false
+        )
       end )
 
       it( 'properly adjusts the transform when "love.graphics.scale" is invoked', function()
@@ -81,25 +98,65 @@ describe( 'love.ext', function()
 
         assert.are.equallists(
           {scalex, 0.0, 0.0, 0.0, scaley, 0.0, 0.0, 0.0, 1.0},
-          love.graphics.getTransform()
+          love.graphics.getTransform(), false
         )
       end )
 
       it( 'properly adjusts the transform when "love.graphics.shear" is invoked', function()
-        pending( 'TODO(JRC)' )
+        local shearx, sheary = 10, 20
+        love.graphics.shear( shearx, sheary )
+
+        assert.are.equallists(
+          {1.0, shearx, 0.0, sheary, 1.0, 0.0, 0.0, 0.0, 1.0},
+          love.graphics.getTransform(), false
+        )
       end )
 
       it( 'properly adjusts the transform when "love.graphics.translate" is invoked', function()
-        pending( 'TODO(JRC)' )
+        local transx, transy = 10, 20
+        love.graphics.translate( transx, transy )
+
+        assert.are.equallists(
+          {1.0, 0.0, transx, 0.0, 1.0, transy, 0.0, 0.0, 1.0},
+          love.graphics.getTransform(), false
+        )
       end )
 
       it( 'resets the transform when "love.graphics.origin" is called', function()
-        pending( 'TODO(JRC)' )
+        love.graphics.translate( 10, 20 )
+        assert.are_not.equallists(
+          {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0},
+          love.graphics.getTransform(), false
+        )
+
+        love.graphics.origin()
+        assert.are.equallists(
+          {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0},
+          love.graphics.getTransform(), false
+        )
       end )
 
       it( 'adjusts the transform following standard stack save/restore behavior when ' ..
           '"love.graphics.pop" and "love.graphics.push" are called', function()
-        pending( 'TODO(JRC)' )
+        for transamt = 1, 10, 1 do
+          love.graphics.translate( 1 )
+          love.graphics.push()
+
+          assert.are.equallists(
+            {1.0, 0.0, transamt, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0},
+            love.graphics.getTransform(), false
+          )
+        end
+
+        for transamt = 10, 1, -1 do
+          love.graphics.translate( 2 * transamt )
+          love.graphics.pop()
+
+          assert.are.equallists(
+            {1.0, 0.0, transamt, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0},
+            love.graphics.getTransform(), false
+          )
+        end
       end )
     end )
   end )

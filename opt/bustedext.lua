@@ -10,9 +10,11 @@ end
 
 -- TODO(JRC): Add a flag to this function to make it possible to perform deep
 -- comparisons on the lists being compared.
+-- TODO(JRC): This function accepts lists too eagerly... options from the
+-- expected table need to be eliminated when they match up with an actual.
 local function equallists( state, arguments )
   local expectedlist, actuallist = arguments[1], arguments[2]
-  local ignoreorder = arguments[3] or true
+  local ignoreorder = arguments[3] == nil and true or arguments[3]
 
   for expectedkey, expectedvalue in ipairs( expectedlist ) do
     local expectedexists = false

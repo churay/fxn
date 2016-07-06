@@ -65,7 +65,7 @@ end
 
 function lgexts.translate( transx, transy )
   local transx, transy = transx or 0.0, transy or 0.0
-  local transxform = { 0.0, 0.0, transx, 0.0, 0.0, transy, 0.0, 0.0, 1.0 }
+  local transxform = { 1.0, 0.0, transx, 0.0, 1.0, transy, 0.0, 0.0, 1.0 }
   lgapplyxform( transxform )
 end
 
