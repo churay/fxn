@@ -66,6 +66,9 @@ function love.draw()
     -- TODO(JRC): Adjust the number of sampling points based on the
     -- dimensions of the rendering window (fewer points for smaller space).
     local plsamplenum = 100
+    -- TODO(JRC): Adjust this number to be the number of turns (calculated
+    -- by something like turns per value * value range).
+    local plsamplesteps = 4
     -- TODO(JRC): Figure out what the actual values for the sample
     -- range of the graph will be (min must be related to turn offset,
     -- max must be related to maximum lookahead).
@@ -110,7 +113,26 @@ function love.draw()
 
       love.graphics.pop()
     end do -- plot discretized function
-      -- TODO(JRC)
+      love.graphics.push()
+      love.graphics.translate( ploriginx, ploriginy )
+      love.graphics.scale( plscalex, plscaley )
+
+      for sidx = 1, plsamplesteps do
+        local sminrx, smaxrx = ( sidx - 1 ) / plsamplesteps, sidx / plsamplesteps
+        local smidrx = ( sidx - 0.5 ) / plsamplesteps
+
+        local sminx = plsamplemin + ( plsamplemax - plsamplemin ) * sminrx
+        local smaxx = plsamplemin + ( plsamplemax - plsamplemin ) * smaxrx
+        local smidx = plsamplemin + ( plsamplemax - plsamplemin ) * smidrx
+
+        local szeroy = ( plresultmax + plresultmin ) / 2.0
+        local smidy = func( smidx )
+
+        love.graphics.polygon( 'line', sminx, szeroy, smaxx, szeroy,
+          smaxx, smidy, sminx, smidy )
+      end
+
+      love.graphics.pop()
     end do -- display plot values at mouse
       love.graphics.push()
       love.graphics.translate( ploriginx, ploriginy )
