@@ -3,6 +3,7 @@ love.ext = require( 'loveext' )
 -- local dbg = require( 'debugger' )
 
 local func = nil
+local board = nil
 local mouse = { x=0, y=0 }
 
 function love.run()
@@ -43,6 +44,9 @@ end
 
 function love.load()
   func = fxn.func_t( function(x) return math.sin(x) end )
+
+  board = fxn.board_t( 2, 2 )
+  print( tostring(board._graph) )
 end
 
 function love.keypressed( key, scancode, isrepeat )
