@@ -116,11 +116,16 @@ function love.draw()
       love.graphics.translate( ploriginx, ploriginy )
       love.graphics.scale( plscalex, plscaley )
 
-      -- TODO(JRC)
       local plmousex, plmousey = love.graphics.transform( mouse.x, mouse.y, true )
-      print( plmousex, plmousey )
+      love.graphics.setColor( unpack(fxn.colors.red) )
+      love.graphics.line( plmousex, plresultmin, plmousex, plresultmax )
 
+      local plmousefuncy = func( plmousex )
+      plmousex, plmousefuncy = love.graphics.transform( plmousex, plmousefuncy )
       love.graphics.pop()
+      plmousex, plmousefuncy = love.graphics.transform( plmousex, plmousefuncy, true )
+
+      love.graphics.circle( 'fill', plmousex, plmousefuncy, 0.01 )
     end
   end
 

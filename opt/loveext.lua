@@ -63,7 +63,7 @@ local function getmatinv( mat )
     end
     rowswap( pidx, ridx )
 
-    for kridx = ridx, 3 do
+    for kridx = 1, 3 do
       if kridx ~= ridx then
         local krscale = -1.0 * maug[getmidx(kridx, ridx)] / maug[getmidx(ridx, ridx)]
         rowadd( ridx, kridx, krscale )
@@ -139,11 +139,11 @@ for lgfname, lgfext in pairs( lgexts ) do
   end
 end
 
-function love.graphics.transform( posx, posy, invert )
-  local invert = invert or false
+function love.graphics.transform( posx, posy, inverse )
+  local inverse = inverse or false
   local vrhs, vres = { posx, posy, 1.0 }, { 0.0, 0.0, 0.0 }
 
-  local xform = invert and getmatinv( lgxform ) or lgxform
+  local xform = inverse and getmatinv( lgxform ) or lgxform
   for ridx = 1, 3 do
     local e = 0
     for eidx = 1, 3 do e = e + xform[getmatidx(ridx, eidx)] * vrhs[eidx] end

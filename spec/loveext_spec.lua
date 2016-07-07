@@ -132,7 +132,7 @@ describe( 'love.ext', function()
       end )
 
       it( 'properly applies the inverse transform to the position given to ' ..
-          '"love.graphics.transform" when the invert flag is set to true', function()
+          '"love.graphics.transform" when the inverse flag is set to true', function()
         local posx, posy = 14, 28
         local transx, transy = 10, 20
 
