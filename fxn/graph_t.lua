@@ -9,6 +9,24 @@ local graph_t = struct( {},
   '_nextnid', 1
 )
 
+--[[ Operators ]]--
+
+function graph_t.__tostring( self )
+  local graphstr = { 'Graph [' .. util.len(self._nodes) .. ']:' }
+  for nid, nlabel in pairs( self._nodes ) do
+    local nodestr = '  ' .. nlabel .. ' [' .. nid .. ']'
+    local edgestr = {}
+    for did, elabel in pairs( self._edges.labels[nid] ) do
+      local nodestr = self._nodes[did] .. ' [' .. did .. ']'
+      table.insert( edgestr, '( ' .. elabel .. ', ' .. nodestr .. ')' )
+    end
+
+    table.insert( graphstr, nodestr .. ' : { ' .. table.concat(edgestr, ', ') ..  ' } ' )
+  end
+
+  return table.concat( graphstr, '\n' )
+end
+
 --[[ Public Functions ]]--
 
 function graph_t.addnode( self, nlabel )

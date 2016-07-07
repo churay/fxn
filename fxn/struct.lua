@@ -11,12 +11,12 @@ local util = require( 'util' )
 --   3+N. Nth Listed Parent Struct of Struct
 local function struct( basestructs, ... )
   local newstruct, newstructmt = { __fields = {}, __fieldnames = {} }, {}
-  local structfields = ... and { ... } or {}
+  local structfields = util.pack( ... )
 
   local basestructs = basestructs or {}
   table.insert( basestructs, 1, newstruct )
 
-  for fidx = 1, #structfields-1, 2 do
+  for fidx = 1, structfields.n - 1, 2 do
     local fname, fval = structfields[fidx+0], structfields[fidx+1]
     if type( fname ) ~= 'string' then return nil end
 
@@ -32,7 +32,7 @@ local function struct( basestructs, ... )
 
   newstructmt.__call = function( newstruct_t, ... )
     local objtable = setmetatable( {}, newstruct )
-    local objfields = ... and { ... } or {}
+    local objfields = util.pack( ... )
 
     for bsidx = 1, #basestructs do
       for fname, fval in pairs( basestructs[bsidx].__fields ) do
@@ -43,7 +43,7 @@ local function struct( basestructs, ... )
     if objtable._init ~= nil then
       objtable:_init( ... )
     else
-      for fidx = 1, math.min( #objfields, #newstruct.__fieldnames ) do
+      for fidx = 1, math.min( objfields.n, #newstruct.__fieldnames ) do
         objtable[newstruct.__fieldnames[fidx]] = objfields[fidx]
       end
     end
