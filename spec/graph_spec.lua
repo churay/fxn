@@ -50,12 +50,12 @@ describe( 'graph_t', function()
   it( 'constructs instances that are initially empty', function()
     local emptygraph = graph_t()
 
-    assert.are.equallists( {}, emptygraph:querynodes() )
-    assert.are.equallists( {}, emptygraph:queryedges() )
+    assert.are.equalsets( {}, emptygraph:querynodes() )
+    assert.are.equalsets( {}, emptygraph:queryedges() )
   end )
 
   it( 'properly adds nodes to the data structure', function()
-    assert.are.equallists( testnodes, testgraph:querynodes() )
+    assert.are.equalsets( testnodes, testgraph:querynodes() )
 
     for nodeidx, node in ipairs( testnodes ) do
       assert.are.equal( tostring(nodeidx), node:getlabel() )
@@ -63,7 +63,7 @@ describe( 'graph_t', function()
   end )
 
   it( 'properly adds new edges to the data structure', function()
-    assert.are.equallists( testedges, testgraph:queryedges() )
+    assert.are.equalsets( testedges, testgraph:queryedges() )
 
     for edgeidx, edge in ipairs( testedges ) do
       assert.are.equal(
@@ -86,7 +86,7 @@ describe( 'graph_t', function()
     assert.falsy( testgraph:addedge(testnodes[1], remotenodes[2]) )
     assert.falsy( testgraph:addedge(remotenodes[1], testnodes[2]) )
 
-    assert.are.equallists( testedges, testgraph:queryedges() )
+    assert.are.equalsets( testedges, testgraph:queryedges() )
   end )
 
   it( 'overwrites existing edges on edge readd', function()
@@ -109,7 +109,7 @@ describe( 'graph_t', function()
       table.remove( testnodes, testnodeidx )
       testgraph:removenode( testnode )
 
-      assert.are.equallists( testnodes, testgraph:querynodes() )
+      assert.are.equalsets( testnodes, testgraph:querynodes() )
     end
   end )
 
@@ -138,7 +138,7 @@ describe( 'graph_t', function()
       table.remove( testedges, testedgeidx )
       testgraph:removeedge( testedge )
 
-      assert.are.equallists( testedges, testgraph:queryedges() )
+      assert.are.equalsets( testedges, testgraph:queryedges() )
     end
   end )
 
@@ -179,7 +179,7 @@ describe( 'graph_t', function()
     end )
 
     assert.are.equal( 3, #queriednodes )
-    assert.are.equallists(
+    assert.are.equalsets(
       { testnodes[3], testnodes[4], testnodes[5] },
       queriednodes
     )
@@ -191,6 +191,6 @@ describe( 'graph_t', function()
     end )
 
     assert.are.equal( 2, #queriededges )
-    assert.are.equallists( {testedges[3], testedges[4]}, queriededges )
+    assert.are.equalsets( {testedges[3], testedges[4]}, queriededges )
   end )
 end )

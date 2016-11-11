@@ -8,27 +8,32 @@ local function equaly( state, arguments )
   return math.abs( expectednumber - actualnumber ) < epsilon
 end
 
--- TODO(JRC): Add a flag to this function to make it possible to perform deep
--- comparisons on the lists being compared.
 -- TODO(JRC): This function accepts lists too eagerly... options from the
 -- expected table need to be eliminated when they match up with an actual.
+local function equalsets( state, arguments )
+  local expectedset, actualset = arguments[1], arguments[2]
+  local comparefxn = arguments[3] == nil and
+    function(a, b) return a == b end or arguments[3]
+
+  for expectedkey, expectedvalue in ipairs( expectedset ) do
+    local expectedexists = false
+    for _, actualvalue in ipairs( actualset ) do
+      expectedexists = expectedexists or comparefxn( expectedvalue, actualvalue )
+    end
+    if not expectedexists then return false end
+  end
+
+  return #expectedset == #actualset
+end
+
 local function equallists( state, arguments )
   local expectedlist, actuallist = arguments[1], arguments[2]
-  local ignoreorder = arguments[3] == nil and true or arguments[3]
+  local comparefxn = arguments[3] == nil and
+    function(a, b) return a == b end or arguments[3]
 
   for expectedkey, expectedvalue in ipairs( expectedlist ) do
-    local expectedexists = false
-
-    if ignoreorder then
-      for _, actualvalue in ipairs( actuallist ) do
-        expectedexists = expectedexists or expectedvalue == actualvalue
-      end
-    else
-      local actualvalue = actuallist[expectedkey]
-      expectedexists = actualvalue ~= nil and expectedvalue == actualvalue
-    end
-
-    if not expectedexists then return false end
+    local actualvalue = actuallist[expectedkey]
+    if not comparefxn( expectedvalue, actualvalue ) then return false end
   end
 
   return #expectedlist == #actuallist
@@ -74,8 +79,15 @@ say:set( "assertion.are_not.equaly",
   "Expected numbers to be sufficiently different.\n" ..
   "Expected:\n%s\nPassed In:\n%s\nEpsilon:\n%s" )
 
+say:set( "assertion.are.equalsets",
+  "Expected lists to be contain the same elements in any order.\n" ..
+  "Expected:\n%s\nPassed In:\n%s" )
+say:set( "assertion.are_not.equalsets",
+  "Expected lists to contain at least one differing element.\n" ..
+  "Expected:\n%s\nPassed In:\n%s" )
+
 say:set( "assertion.are.equallists",
-  "Expected lists to be contain the same elements.\n" ..
+  "Expected lists to be contain the same elements in the same order.\n" ..
   "Expected:\n%s\nPassed In:\n%s" )
 say:set( "assertion.are_not.equallists",
   "Expected lists to contain at least one differing element.\n" ..
@@ -90,6 +102,8 @@ say:set( "assertion.are_not.equaltables",
 
 assert:register( "assertion", "equaly", equaly,
   "assertion.are.equaly", "assertion.are_not.equaly" )
+assert:register( "assertion", "equalsets", equalsets,
+  "assertion.are.equalsets", "assertion.are_not.equalsets" )
 assert:register( "assertion", "equallists", equallists,
   "assertion.are.equallists", "assertion.are_not.equallists" )
 assert:register( "assertion", "equaltables", equaltables,

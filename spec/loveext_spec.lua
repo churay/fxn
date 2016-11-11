@@ -62,7 +62,8 @@ describe( 'love.ext', function()
           'other "love.graphics" functions are called beforehand', function()
         assert.are.equallists(
           {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0},
-          love.graphics.getTransform(), false
+          love.graphics.getTransform(),
+          util.fequal
         )
       end )
 
@@ -73,23 +74,24 @@ describe( 'love.ext', function()
 
         assert.are.equallists(
           {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0},
-          love.graphics.getTransform(), false
+          love.graphics.getTransform(),
+          util.fequal
         )
       end )
 
       it( 'properly adjusts the transform when "love.graphics.rotate" is invoked', function()
-        pending( 'TODO(JRC): Add support for "equaly" in lists.' )
-
         love.graphics.rotate( math.pi / 2.0 )
         assert.are.equallists(
-          {0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0},
-          love.graphics.getTransform(), false
+          {0.0, -1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0},
+          love.graphics.getTransform(),
+          util.fequal
         )
 
         love.graphics.rotate( math.pi / 2.0 )
         assert.are.equallists(
-          {-1.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0},
-          love.graphics.getTransform(), false
+          {-1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 1.0},
+          love.graphics.getTransform(),
+          util.fequal
         )
       end )
 
@@ -99,7 +101,8 @@ describe( 'love.ext', function()
 
         assert.are.equallists(
           {scalex, 0.0, 0.0, 0.0, scaley, 0.0, 0.0, 0.0, 1.0},
-          love.graphics.getTransform(), false
+          love.graphics.getTransform(),
+          util.fequal
         )
       end )
 
@@ -109,7 +112,8 @@ describe( 'love.ext', function()
 
         assert.are.equallists(
           {1.0, shearx, 0.0, sheary, 1.0, 0.0, 0.0, 0.0, 1.0},
-          love.graphics.getTransform(), false
+          love.graphics.getTransform(),
+          util.fequal
         )
       end )
 
@@ -119,7 +123,8 @@ describe( 'love.ext', function()
 
         assert.are.equallists(
           {1.0, 0.0, transx, 0.0, 1.0, transy, 0.0, 0.0, 1.0},
-          love.graphics.getTransform(), false
+          love.graphics.getTransform(),
+          util.fequal
         )
       end )
 
@@ -129,7 +134,11 @@ describe( 'love.ext', function()
 
         love.graphics.translate( transx, transy )
         local xformx, xformy = love.graphics.transform( posx, posy )
-        assert.are.equallists( {posx + transx, posy + transy}, {xformx, xformy}, false )
+        assert.are.equallists(
+          {posx + transx, posy + transy},
+          {xformx, xformy},
+          util.fequal
+        )
       end )
 
       it( 'properly applies the inverse transform to the position given to ' ..
@@ -139,20 +148,26 @@ describe( 'love.ext', function()
 
         love.graphics.translate( transx, transy )
         local xformx, xformy = love.graphics.transform( posx, posy, true )
-        assert.are.equallists( {posx - transx, posy - transy}, {xformx, xformy}, false )
+        assert.are.equallists(
+          {posx - transx, posy - transy},
+          {xformx, xformy},
+          util.fequal
+        )
       end )
 
       it( 'resets the transform when "love.graphics.origin" is called', function()
         love.graphics.translate( 10, 20 )
         assert.are_not.equallists(
           {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0},
-          love.graphics.getTransform(), false
+          love.graphics.getTransform(),
+          util.fequal
         )
 
         love.graphics.origin()
         assert.are.equallists(
           {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0},
-          love.graphics.getTransform(), false
+          love.graphics.getTransform(),
+          util.fequal
         )
       end )
 
@@ -164,7 +179,8 @@ describe( 'love.ext', function()
 
           assert.are.equallists(
             {1.0, 0.0, transamt, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0},
-            love.graphics.getTransform(), false
+            love.graphics.getTransform(),
+            util.fequal
           )
         end
 
@@ -174,7 +190,8 @@ describe( 'love.ext', function()
 
           assert.are.equallists(
             {1.0, 0.0, transamt, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0},
-            love.graphics.getTransform(), false
+            love.graphics.getTransform(),
+            util.fequal
           )
         end
       end )

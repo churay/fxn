@@ -11,6 +11,11 @@ function util.clamp( v, min, max )
   return math.max( math.min(v, max), min )
 end
 
+function util.fequal( v1, v2, epsilon )
+  local epsilon = epsilon or 1e-7
+  return math.abs( v1 - v2 ) < epsilon
+end
+
 --[[ System Functions ]]--
 
 function util.libload( libbase )
