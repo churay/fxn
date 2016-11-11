@@ -8,17 +8,22 @@ local function equaly( state, arguments )
   return math.abs( expectednumber - actualnumber ) < epsilon
 end
 
--- TODO(JRC): This function accepts lists too eagerly... options from the
--- expected table need to be eliminated when they match up with an actual.
 local function equalsets( state, arguments )
   local expectedset, actualset = arguments[1], arguments[2]
   local comparefxn = arguments[3] == nil and
     function(a, b) return a == b end or arguments[3]
 
+  local tempset = {}
+  for k, v in ipairs( actualset ) do tempset[k] = v end
+
   for expectedkey, expectedvalue in ipairs( expectedset ) do
     local expectedexists = false
-    for _, actualvalue in ipairs( actualset ) do
-      expectedexists = expectedexists or comparefxn( expectedvalue, actualvalue )
+    for actualkey, actualvalue in ipairs( tempset ) do
+      if comparefxn( expectedvalue, actualvalue ) and not expectedexists then
+        expectedexists = true
+        table.remove( tempset, actualkey )
+        break
+      end
     end
     if not expectedexists then return false end
   end
