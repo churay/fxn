@@ -1,4 +1,5 @@
 require( 'bustedext' )
+local util = require( 'fxn.util' )
 
 describe( 'love.ext', function()
   --[[ Testing Constants ]]--
@@ -51,8 +52,8 @@ describe( 'love.ext', function()
         love.graphics[lgoverfxn]()
         assert.stub(lovestub.graphics[lgoverfxn]).was_called_with()
 
-        love.graphics[lgoverfxn]( table.unpack(testparams) )
-        assert.stub(lovestub.graphics[lgoverfxn]).was_called_with( table.unpack(testparams) )
+        love.graphics[lgoverfxn]( util.unpack(testparams) )
+        assert.stub(lovestub.graphics[lgoverfxn]).was_called_with( util.unpack(testparams) )
       end
     end )
 

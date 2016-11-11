@@ -10,7 +10,7 @@ local func_t = struct( {}, '_fxn', function(x) return 0 end, '_sfxns', {} )
 
 function func_t._init( self, fxn, ... )
   self._fxn = fxn or function(x) return 0 end
-  self._sfxns = util.pack( ... )
+  self._sfxns = { ... }
 end
 
 --[[ Static Functions ]]--

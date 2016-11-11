@@ -91,9 +91,9 @@ end
 function graph_t.findedge( self, ... )
   local edge = nil
 
-  local arg = util.pack( ... )
-  if arg.n == 1 then edge = arg[1]
-  elseif arg.n == 2 then edge = graph_t.edge_t( self, arg[1]._nid, arg[2]._nid )
+  local args = { ... }
+  if #args == 1 then edge = args[1]
+  elseif #args == 2 then edge = graph_t.edge_t( self, args[1]._nid, args[2]._nid )
   else edge = nil end
 
   if edge and self == edge._graph and

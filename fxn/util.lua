@@ -73,12 +73,9 @@ function util.copy( orig, copymt, _copied )
   return copy
 end
 
-function util.pack( ... )
-  return { n = select('#', ...), ... }
-end
-
-function util.unpack( vargs )
-  return unpack( vargs, 1, vargs.n )
+function util.unpack( t, i )
+  local i = i or 1
+  if t[i] ~= nil then return t[i], util.unpack( t, i + 1 ) end
 end
 
 return util
