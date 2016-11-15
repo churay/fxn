@@ -16,8 +16,7 @@ local util = require( 'util' )
 local board_t = struct( {}, '_graph', graph_t(), '_nodes', {}, '_width', 0, '_height', 0 )
 
 function board_t._init( self, width, height )
-  self._graph = graph_t()
-  self._nodes = {}
+  self._graph, self._nodes = graph_t(), {}
   self._width, self._height = width, height
 
   -- insert all cells into the graph --
@@ -53,7 +52,7 @@ function board_t._init( self, width, height )
           if celldir == 1 then celldy = celldv else celldx = celldv end
           local adjx, adjy = cellx + celldx, celly + celldy
 
-          if self:_iscellvalid( adjx, adjy ) and util.inrange( adjx, 1, self._width ) then
+          if self:_iscellvalid( adjx, adjy ) then
             local adjcellidx = self:_getcellidx( adjx, adjy )
             self._graph:addedge(
               self:_getcellnode( cellidx ),
@@ -88,7 +87,8 @@ function board_t._getcellpos( self, cellidx )
 end
 
 function board_t._iscellvalid( self, cellx, celly )
-  return util.inrange( self:_getcellidx(cellx, celly), 1, self._width * self._height )
+  return util.inrange( cellx, 1, self._width ) and
+    util.inrange( celly, 1, self._height )
 end
 
 return board_t

@@ -33,7 +33,7 @@ function util.libload( libbase )
   return lib
 end
 
---[[ Lua Language Functions ]]--
+--[[ Table Functions ]]--
 
 function util.map( l, fmap )
   local m = {}
@@ -63,6 +63,8 @@ function util.len( l )
   for _ in pairs( l ) do len = len + 1 end
   return len
 end
+
+--[[ Language Functions ]]--
 
 function util.copy( orig, copymt, _copied )
   if type( orig ) ~= 'table' then return orig end

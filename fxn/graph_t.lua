@@ -139,7 +139,7 @@ end
 
 --[[ Private Classes ]]--
 
-graph_t.node_t = struct( {}, '_graph', -1, '_nid', -1 )
+graph_t.node_t = struct( {}, '_graph', false, '_nid', false )
 
 function graph_t.node_t.__eq( self, other )
   return self._graph == other._graph and self._nid == other._nid
@@ -171,7 +171,7 @@ function graph_t.node_t.getinedges( self )
   return inedges
 end
 
-graph_t.edge_t = struct( {}, '_graph', -1, '_srcnid', -1, '_dstnid', -1 )
+graph_t.edge_t = struct( {}, '_graph', false, '_srcnid', false, '_dstnid', false )
 
 function graph_t.edge_t.__eq( self, other )
   return self._graph == other._graph and self._srcnid == other._srcnid and
