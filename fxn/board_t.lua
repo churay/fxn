@@ -2,6 +2,15 @@ local struct = require( 'struct' )
 local graph_t = require( 'graph_t' )
 local util = require( 'util' )
 
+-- TODO(JRC): This code could be extended in to make more general types of
+-- boards possible by abstracting out the concepts of tiles and directions.
+-- - Tile: A space on the board that's inhabitable by a piece.  The shape of
+--   this tile will be determined first by its default number of connections
+--   (e.g. 4 connections implies a square) and second by overriding factors.
+-- - Direction: An abstract relationship between tiles that indicates how a
+--   piece may traverse from one tile to another.  These could be interpretted
+--   as directions or more abstractly as enumerations with defined relationships.
+
 --[[ Constructor ]]--
 
 local board_t = struct( {}, '_graph', graph_t(), '_nodes', {}, '_width', 0, '_height', 0 )
@@ -39,7 +48,7 @@ function board_t._init( self, width, height )
       local cellidx = self:_getcellidx( cellx, celly )
 
       for celldv = -1, 1, 2 do
-        for celldir = 1, 2 do
+        for celldir = 1, 2, 1 do
           local celldx, celldy = 0, 0
           if celldir == 1 then celldy = celldv else celldx = celldv end
           local adjx, adjy = cellx + celldx, celly + celldy
@@ -47,8 +56,9 @@ function board_t._init( self, width, height )
           if self:_iscellvalid( adjx, adjy ) and util.inrange( adjx, 1, self._width ) then
             local adjcellidx = self:_getcellidx( adjx, adjy )
             self._graph:addedge(
-              self:_getcellnode( cellidx ), self:_getcellnode( adjcellidx ),
-              genlabel( cellidx, adjcellidx ), genlabel( adjcellidx, cellidx )
+              self:_getcellnode( cellidx ),
+              self:_getcellnode( adjcellidx ),
+              genlabel( cellidx, adjcellidx )
             )
           end
         end
