@@ -142,6 +142,68 @@ describe( 'util', function()
     end )
   end )
 
+  describe( 'lmatches', function()
+    local testlist = nil
+
+    before_each( function()
+      testlist = { 1, 2, 5, 3, 1, 4, 5, 1 }
+    end )
+
+    it( 'returns the false if there are no matches', function()
+      assert.are.equal( false, util.lmatches(testlist, 0) )
+      assert.are.equal( false, util.lmatches(testlist, 6) )
+      assert.are.equal( false, util.lmatches(testlist, '1') )
+    end )
+
+    it( 'returns the correct number of matches if there are one or more', function()
+      assert.are.equal( 3, util.lmatches(testlist, 1) )
+      assert.are.equal( 2, util.lmatches(testlist, 5) )
+      for _, v in ipairs( {2, 3, 4} ) do
+        assert.are.equal( 1, util.lmatches(testlist, v) )
+      end
+    end )
+  end )
+
+  describe( 'lsub', function()
+    local testlist = nil
+
+    before_each( function()
+      testlist = { 1, 2, 5, 3, 1, 4, 5, 1 }
+    end )
+
+    it( 'does not modify tables that do not contain the remove value', function()
+      local testlistorig = util.copy( testlist )
+
+      util.lsub( testlist, 6 )
+      assert.are.equallists( testlistorig, testlist )
+
+      util.lsub( testlist, '1' )
+      assert.are.equallists( testlistorig, testlist )
+    end )
+
+    it( 'removes the last instance matching the value from the list when the remove ' ..
+        'all option is disabled', function()
+      util.lsub( testlist, 1 )
+      assert.are.equallists( {1, 2, 5, 3, 1, 4, 5}, testlist )
+      util.lsub( testlist, 1, false )
+      assert.are.equallists( {1, 2, 5, 3, 4, 5}, testlist )
+
+      util.lsub( testlist, 5 )
+      assert.are.equallists( {1, 2, 5, 3, 4}, testlist )
+      util.lsub( testlist, 5, false )
+      assert.are.equallists( {1, 2, 3, 4}, testlist )
+    end )
+
+    it( 'removes each instance matching the value from the list when the remove ' ..
+        'all option is enabled', function()
+      util.lsub( testlist, 1, true )
+      assert.are.equallists( {2, 5, 3, 4, 5}, testlist )
+
+      util.lsub( testlist, 5, true )
+      assert.are.equallists( {2, 3, 4}, testlist )
+    end )
+  end )
+
   describe( 'len', function()
     it( 'returns 0 for empty lists', function()
       assert.are.equal( 0, util.len({}) )

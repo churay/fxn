@@ -58,6 +58,24 @@ function util.reduce( l, facc, v0 )
   return vacc
 end
 
+function util.lmatches( l, v )
+  local matches = 0
+  for _, lv in ipairs( l ) do
+    if lv == v then matches = matches + 1 end
+  end
+  return matches ~= 0 and matches or false
+end
+
+function util.lsub( l, v, rall )
+  local rall = rall or false
+  for i = #l, 1, -1 do
+    if l[i] == v then
+      table.remove( l, i )
+      if not rall then break end
+    end
+  end
+end
+
 function util.len( l )
   local len = 0
   for _ in pairs( l ) do len = len + 1 end
