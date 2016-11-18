@@ -36,7 +36,7 @@ local function struct( basestructs, ... )
 
     for bsidx = 1, #basestructs do
       for fname, fval in pairs( basestructs[bsidx].__fields ) do
-        if objtable[fname] == nil then objtable[fname] = util.copy( fval ) end
+        if objtable[fname] == nil then objtable[fname] = util.copy( fval, true ) end
       end
     end
 

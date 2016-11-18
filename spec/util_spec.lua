@@ -172,7 +172,7 @@ describe( 'util', function()
     end )
 
     it( 'does not modify tables that do not contain the remove value', function()
-      local testlistorig = util.copy( testlist )
+      local testlistorig = { 1, 2, 5, 3, 1, 4, 5, 1 }
 
       util.lsub( testlist, 6 )
       assert.are.equallists( testlistorig, testlist )
