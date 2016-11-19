@@ -62,21 +62,45 @@ describe( 'graph_t', function()
     end
   end )
 
+  it( 'properly replaces nodes when reusing labels for unique graphs', function()
+    pending( 'TODO(JRC)' )
+  end )
+
   it( 'properly adds new edges to the data structure', function()
     assert.are.equalsets( testedges, testgraph:queryedges() )
 
     for edgeidx, edge in ipairs( testedges ) do
       assert.are.equal(
-        edge:getsource():getlabel() .. '>' .. edge:getdestination():getlabel(),
+        edge:getsrc():getlabel() .. '>' .. edge:getdst():getlabel(),
         edge:getlabel()
       )
     end
+  end )
+
+  it( 'properly replaces edges when reusing labels for unique graphs', function()
+    pending( 'TODO(JRC)' )
   end )
 
   it( 'supports adding new bidirectional edges to the data structure', function()
     pending( 'TODO(JRC)' )
     -- Change the Test Graph to Use Bidirectional Insertion
     -- Test the Integrity of the Bidirectional Edge Here
+  end )
+
+  it( 'supports finding nodes by struct, label, and id', function()
+    for nodeidx, node in ipairs( testnodes ) do
+      assert.are.same( node, testgraph:findnode(node) )
+      assert.are.same( node, testgraph:findnode(node:getlabel()) )
+      assert.are.same( node, testgraph:findnode(node:getid()) )
+    end
+  end )
+
+  it( 'supports finding edges by struct, label, and endpoints', function()
+    for edgeidx, edge in ipairs( testedges ) do
+      assert.are.same( edge, testgraph:findedge(edge) )
+      assert.are.same( edge, testgraph:findedge(edge:getlabel()) )
+      assert.are.same( edge, testgraph:findedge(edge:getsrc(), edge:getdst()) )
+    end
   end )
 
   it( 'does not allow adding edges with invalid start/end nodes', function()
@@ -89,15 +113,15 @@ describe( 'graph_t', function()
 
   it( 'overwrites existing edges on edge readd', function()
     local overwriteedge = testgraph:queryedges()[1]
-    local overwritesrc = overwriteedge:getsource()
-    local overwritedst = overwriteedge:getdestination()
+    local overwritesrc = overwriteedge:getsrc()
+    local overwritedst = overwriteedge:getdst()
 
     local newelabel = '-' .. overwriteedge:getlabel() .. '-'
     local newedge = testgraph:addedge( overwritesrc, overwritedst, newelabel )
 
     assert.are.equal( newelabel, newedge:getlabel() )
-    assert.are.equal( overwritesrc, newedge:getsource() )
-    assert.are.equal( overwritedst, newedge:getdestination() )
+    assert.are.equal( overwritesrc, newedge:getsrc() )
+    assert.are.equal( overwritedst, newedge:getdst() )
   end )
 
   it( 'properly removes nodes from the data structure', function()
@@ -160,8 +184,7 @@ describe( 'graph_t', function()
 
   it( 'supports "findedge" edge queries using endpoint nodes', function()
     for _, edge in ipairs( testedges ) do
-      local edgesrc = edge:getsource()
-      local edgedst = edge:getdestination()
+      local edgesrc, edgedst = edge:getsrc(), edge:getdst()
       assert.are.equal( edge, testgraph:findedge(edgesrc, edgedst) )
     end
 
@@ -185,7 +208,7 @@ describe( 'graph_t', function()
 
   it( 'facilitates arbitrary edge queries with "queryedges"', function()
     local queriededges = testgraph:queryedges( function(e)
-      return e:getdestination() == testnodes[5] or e:getsource() == testnodes[5]
+      return e:getdst() == testnodes[5] or e:getsrc() == testnodes[5]
     end )
 
     assert.are.equal( 2, #queriededges )

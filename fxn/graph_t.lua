@@ -113,6 +113,7 @@ function graph_t.findnode( self, node )
     if node._graph == self and self._nodes[node._nid] ~= nil then return node end
   -- id argument --
   elseif nodeid ~= nil then
+    local nodeid = tonumber( nodeid )
     if self._nodes[nodeid] ~= nil then return graph_t.node_t( self, nodeid ) end
   -- label argument --
   else
@@ -140,7 +141,7 @@ function graph_t.findedge( self, ... )
       local edgeids = self._elabels[args[1]]
       if #edgeids ~= 0 then
         local srcnid, dstnid = string.match( edgeids[1], '^(%d+)-(%d+)$' )
-        return graph_t.edge_t( self, srcnid, dstnid )
+        return graph_t.edge_t( self, tonumber(srcnid), tonumber(dstnid) )
       end
     end
   -- nodes argument --
@@ -195,7 +196,7 @@ function graph_t.node_t.__eq( self, other )
 end
 
 function graph_t.node_t.getid( self )
-  return table.concat( '@', tostring(self._nid) )
+  return table.concat( {'@', tostring(self._nid)} )
 end
 
 function graph_t.node_t.getlabel( self )
@@ -226,18 +227,18 @@ function graph_t.edge_t.__eq( self, other )
 end
 
 function graph_t.edge_t.getid( self )
-  return table.concat( '@', tostring(self._srcnid), '-', tostring(self._dstnid) )
+  return table.concat( {'@', tostring(self._srcnid), '-', tostring(self._dstnid)} )
 end
 
 function graph_t.edge_t.getlabel( self )
   return self._graph._edges.labels[self._srcnid][self._dstnid]
 end
 
-function graph_t.edge_t.getsource( self )
+function graph_t.edge_t.getsrc( self )
   return graph_t.node_t( self._graph, self._srcnid )
 end
 
-function graph_t.edge_t.getdestination( self )
+function graph_t.edge_t.getdst( self )
   return graph_t.node_t( self._graph, self._dstnid )
 end
 
