@@ -75,10 +75,8 @@ describe( 'graph_t', function()
 
   it( 'supports adding new bidirectional edges to the data structure', function()
     pending( 'TODO(JRC)' )
-    --[[
-      Change the Test Graph to Use Bidirectional Insertion
-      Test the Integrity of the Bidirectional Edge Here
-    --]]
+    -- Change the Test Graph to Use Bidirectional Insertion
+    -- Test the Integrity of the Bidirectional Edge Here
   end )
 
   it( 'does not allow adding edges with invalid start/end nodes', function()

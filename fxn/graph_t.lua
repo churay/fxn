@@ -16,7 +16,11 @@ local graph_t = struct( {},
 --[[ Operators ]]--
 
 function graph_t.__tostring( self )
-  local graphstr = { 'Graph {', self._unique and 'U' or 'D', '} [', util.len(self._nodes), ']:' }
+  local graphstr = {}
+
+  local uniquestr, lenstr = ( self._unique and 'U' or 'D' ), util.len( self._nodes )
+  local headerstr = { 'Graph {', uniquestr, '} [', lenstr, ']:' }
+  table.insert( graphstr, table.concat(headerstr, '') )
 
   for nid, nlabel in pairs( self._nodes ) do
     local nodestr = { '  ', nlabel, ' [', nid, ']' }
@@ -26,8 +30,8 @@ function graph_t.__tostring( self )
       table.insert( edgestr, '( ' .. elabel .. ', ' .. nodestr .. ')' )
     end
 
-    table.insert( graphstr, table.concat(nodestr, '') )
-    table.insert( graphstr, ' : { ' .. table.concat(edgestr, ', ') ..  ' } ' )
+    nodestr, edgestr = table.concat( nodestr, '' ), table.concat( edgestr, ', ' )
+    table.insert( graphstr, table.concat({nodestr, ' : { ', edgestr, ' }'}) )
   end
 
   return table.concat( graphstr, '\n' )
@@ -75,8 +79,13 @@ end
 function graph_t.removenode( self, node )
   local node = self:findnode( node )
   if node then
-    for _, ie in ipairs( node:getinedges() ) do self:removeedge( ie ) end
-    for _, oe in ipairs( node:getoutedges() ) do self:removeedge( oe ) end
+    local inedges, outedges = node:getinedges(), node:getoutedges()
+    for _, ie in ipairs( inedges ) do
+      self:removeedge( ie )
+    end
+    for _, oe in ipairs( outedges ) do
+      self:removeedge( oe )
+    end
 
     util.lsub( self._nlabels[node:getlabel()], node._nid )
     self._nodes[node._nid] = nil
@@ -101,7 +110,7 @@ function graph_t.findnode( self, node )
 
   -- node_t argument --
   if getmetatable( node ) == graph_t.node_t then
-    if self == node._graph and self._nodes[node._nid] ~= nil then return node end
+    if node._graph == self and self._nodes[node._nid] ~= nil then return node end
   -- id argument --
   elseif nodeid ~= nil then
     if self._nodes[nodeid] ~= nil then return graph_t.node_t( self, nodeid ) end
@@ -123,8 +132,8 @@ function graph_t.findedge( self, ... )
     -- edge_t argument --
     if getmetatable( args[1] ) == graph_t.edge_t then
       local srcnid, dstnid = args[1]._srcnid, args[1]._dstnid
-      if self == args[1]._graph and edgeexists( srcnid, dstnid ) then
-        return edge
+      if args[1]._graph == self and edgeexists( srcnid, dstnid ) then
+        return args[1]
       end
     -- label argument --
     else
@@ -137,7 +146,7 @@ function graph_t.findedge( self, ... )
   -- nodes argument --
   elseif #args == 2 then
     local srcnode, dstnode = self:findnode( args[1] ), self:findnode( args[2] )
-    if srcnode and dstnode then
+    if srcnode and dstnode and edgeexists( srcnode._nid, dstnode._nid) then
       return graph_t.edge_t( self, srcnode._nid, dstnode._nid )
     end
   end
@@ -231,11 +240,11 @@ function graph_t.edge_t.getlabel( self )
 end
 
 function graph_t.edge_t.getsource( self )
-  return self._graph:findnode( graph_t.node_t(self._graph, self._srcnid) )
+  return graph_t.node_t( self._graph, self._srcnid )
 end
 
 function graph_t.edge_t.getdestination( self )
-  return self._graph:findnode( graph_t.node_t(self._graph, self._dstnid) )
+  return graph_t.node_t( self._graph, self._dstnid )
 end
 
 return graph_t
