@@ -204,23 +204,17 @@ end
 
 function graph_t.node_t.getoutedges( self )
   local outedges = {}
-
   for dstnid in pairs( self._graph._edges.outgoing[self._nid] ) do
-    local dstnode = graph_t.node_t( self._graph, dstnid )
-    table.insert( outedges, self._graph:findedge(self, dstnode) )
+    table.insert( outedges, graph_t.edge_t(self._graph, self._nid, dstnid) )
   end
-
   return outedges
 end
 
 function graph_t.node_t.getinedges( self )
   local inedges = {}
-
   for srcnid in pairs( self._graph._edges.incoming[self._nid] ) do
-    local srcnode = graph_t.node_t( self._graph, srcnid )
-    table.insert( inedges, self._graph:findedge(srcnode, self) )
+    table.insert( inedges, graph_t.edge_t(self._graph, srcnid, self._nid) )
   end
-
   return inedges
 end
 
