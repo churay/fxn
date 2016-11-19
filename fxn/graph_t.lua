@@ -5,7 +5,8 @@ local util = require( 'util' )
 --[[ Constructor ]]--
 
 local graph_t = struct( {},
-  '_unique', false,
+  '_nlabelsunique', false,
+  '_elabelsunique', false,
   '_nodes', {},
   '_edges', {labels={}, outgoing={}, incoming={}},
   '_nlabels', table_t({}),
@@ -18,8 +19,11 @@ local graph_t = struct( {},
 function graph_t.__tostring( self )
   local graphstr = {}
 
-  local uniquestr, lenstr = ( self._unique and 'U' or 'D' ), util.len( self._nodes )
-  local headerstr = { 'Graph {', uniquestr, '} [', lenstr, ']:' }
+  local headerstr = { 'Graph {', '', '|', '', '} [', '', '|', '', ']:' }
+  headerstr[2] = self._nlabelsunique and 'U' or 'D'
+  headerstr[4] = self._elabelsunique and 'U' or 'D'
+  headerstr[6] = tostring( #self:querynodes() )
+  headerstr[8] = tostring( #self:queryedges() )
   table.insert( graphstr, table.concat(headerstr, '') )
 
   for nid, nlabel in pairs( self._nodes ) do
@@ -40,7 +44,7 @@ end
 --[[ Public Functions ]]--
 
 function graph_t.addnode( self, nlabel )
-  if self._unique and #self._nlabels[nlabel] ~= 0 then
+  if self._nlabelsunique and #self._nlabels[nlabel] ~= 0 then
     self:removenode( nlabel, 'label' )
   end
 
@@ -61,7 +65,7 @@ function graph_t.addedge( self, srcnode, dstnode, elabel, bielabel )
   local srcnode, dstnode = self:findnode( srcnode ), self:findnode( dstnode )
   if srcnode and dstnode then
     self:removeedge( srcnode, dstnode )
-    if self._unique and #self._elabels[elabel] ~= 0 then
+    if self._elabelsunique and #self._elabels[elabel] ~= 0 then
       self:removeedge( elabel )
     end
 

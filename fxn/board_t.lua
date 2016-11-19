@@ -13,18 +13,16 @@ local util = require( 'util' )
 
 --[[ Constructor ]]--
 
-local board_t = struct( {}, '_graph', graph_t(), '_nodes', {}, '_width', 0, '_height', 0 )
+local board_t = struct( {}, '_graph', graph_t(), '_width', 0, '_height', 0 )
 
 function board_t._init( self, width, height )
-  self._graph, self._nodes = graph_t(), {}
+  self._graph = graph_t( true, false )
   self._width, self._height = width, height
 
   -- insert all cells into the graph --
   for celly = 1, self._height do
     for cellx = 1, self._width do
-      local cellidx = self:_getcellidx( cellx, celly )
-      local cellnode = self._graph:addnode( cellidx )
-      table.insert( self._nodes, cellnode )
+      self._graph:addnode( self:_getcellidx(cellx, celly) )
     end
   end
 
@@ -54,11 +52,8 @@ function board_t._init( self, width, height )
 
           if self:_iscellvalid( adjx, adjy ) then
             local adjcellidx = self:_getcellidx( adjx, adjy )
-            self._graph:addedge(
-              self:_getcellnode( cellidx ),
-              self:_getcellnode( adjcellidx ),
-              genlabel( cellidx, adjcellidx )
-            )
+            self._graph:addedge( cellidx, adjcellidx,
+              genlabel(cellidx, adjcellidx) )
           end
         end
       end
@@ -71,11 +66,6 @@ end
 
 
 --[[ Private Functions ]]--
-
-function board_t._getcellnode( self, cellx, celly )
-  local cellidx = celly == nil and cellx or self:_getcellidx( cellx, celly )
-  return self._nodes[cellidx]
-end
 
 function board_t._getcellidx( self, cellx, celly )
   return self._width * ( celly - 1 ) + cellx

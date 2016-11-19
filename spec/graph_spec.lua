@@ -62,7 +62,8 @@ describe( 'graph_t', function()
     end
   end )
 
-  it( 'properly replaces nodes when reusing labels for unique graphs', function()
+  it( 'properly replaces nodes when adding a duplicate label on a unique ' ..
+      'node label graph', function()
     pending( 'TODO(JRC)' )
   end )
 
@@ -77,7 +78,8 @@ describe( 'graph_t', function()
     end
   end )
 
-  it( 'properly replaces edges when reusing labels for unique graphs', function()
+  it( 'properly replaces edges when adding a duplicate label on a unique ' ..
+      'edge label graph', function()
     pending( 'TODO(JRC)' )
   end )
 
