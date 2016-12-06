@@ -92,16 +92,16 @@ describe( 'util', function()
 
     it( 'returns a list where each list value is xformed by the input function', function()
       assert.are.equallists( {}, util.map(emptylist, mfxn) )
-      assert.are.equallists( { 2 }, util.map(shortlist, mfxn) )
-      assert.are.equallists( { 2, 4, 6 }, util.map(longlist, mfxn) )
+      assert.are.equallists( {2}, util.map(shortlist, mfxn) )
+      assert.are.equallists( {2, 4, 6}, util.map(longlist, mfxn) )
     end )
 
     it( 'returns without modifying the original input list', function()
       for _, tl in ipairs( {emptylist, shortlist, longlist} ) do util.map( tl, mfxn ) end
 
       assert.are.equallists( {}, emptylist )
-      assert.are.equallists( { 1 }, shortlist )
-      assert.are.equallists( { 1, 2, 3 }, longlist )
+      assert.are.equallists( {1}, shortlist )
+      assert.are.equallists( {1, 2, 3}, longlist )
     end )
   end )
 
@@ -137,8 +137,53 @@ describe( 'util', function()
       for _, tl in ipairs( {emptylist, shortlist, longlist} ) do util.reduce( tl, rfxn ) end
 
       assert.are.equallists( {}, emptylist )
-      assert.are.equallists( { 1 }, shortlist )
-      assert.are.equallists( { 1, 2, 3 }, longlist )
+      assert.are.equallists( {1}, shortlist )
+      assert.are.equallists( {1, 2, 3}, longlist )
+    end )
+  end )
+
+  describe( 'lconcat', function()
+    local list1 = nil
+    local list2 = nil
+
+    before_each( function()
+      list1 = { 1, 2, 3 }
+      list2 = { 4, 5 }
+    end )
+
+    it( 'returns the concatenation of the two lists when one or more ' ..
+        'lists is empty', function()
+      for ipmode = 1, 2 do
+        local ip = ipmode == 1
+
+        assert.are.equallists( {}, util.lconcat({}, {}, ip) )
+
+        assert.are.equallists( {1, 2, 3}, util.lconcat(list1, {}, ip) )
+        assert.are.equallists( {4, 5}, util.lconcat(list2, {}, ip) )
+
+        assert.are.equallists( {1, 2, 3}, util.lconcat({}, list1, ip) )
+        assert.are.equallists( {4, 5}, util.lconcat({}, list2, ip) )
+      end
+    end )
+
+    it( 'returns the concatenation of the two lists when both are ' ..
+        'non-empty', function()
+      assert.are.equallists( {1, 2, 3, 4, 5}, util.lconcat(list1, list2) )
+      assert.are.equallists( {4, 5, 1, 2, 3}, util.lconcat(list2, list1) )
+
+      assert.are.equallists( {1, 2, 3, 4, 5}, util.lconcat(list1, list2, true) )
+      assert.are.equallists( {4, 5, 1, 2, 3, 4, 5}, util.lconcat(list2, list1, true) )
+    end )
+
+    it( 'returns a new list when not running in-place (default)', function()
+      local listconcat = util.lconcat( list1, list2 )
+      assert.are_not.equal( list1, listconcat )
+      assert.are_not.equal( list2, listconcat )
+    end )
+
+    it( 'modifies and returns the first list when running in-place', function()
+      assert.are.equal( list1, util.lconcat(list1, list2, true) )
+      assert.are.equal( list2, util.lconcat(list2, list1, true) )
     end )
   end )
 

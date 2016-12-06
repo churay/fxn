@@ -58,6 +58,13 @@ function util.reduce( l, facc, v0 )
   return vacc
 end
 
+function util.lconcat( l1, l2, ip )
+  local l = ip and l1 or {}
+  if not ip then for _, v1 in ipairs( l1 ) do table.insert( l, v1 ) end end
+  for _, v2 in ipairs( l2 ) do table.insert( l, v2 ) end
+  return l
+end
+
 function util.lmatches( l, v )
   local matches = 0
   for _, lv in ipairs( l ) do
