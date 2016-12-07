@@ -13,16 +13,19 @@ local util = require( 'util' )
 
 --[[ Constructor ]]--
 
-local board_t = struct( {}, '_graph', graph_t(), '_width', 0, '_height', 0 )
+local board_t = struct( {}, '_graph', graph_t(), '_cells', {}, '_width', 0, '_height', 0 )
 
 function board_t._init( self, width, height )
   self._graph = graph_t( true, false )
+  self._cells = {}
   self._width, self._height = width, height
 
   -- insert all cells into the graph --
   for celly = 1, self._height do
     for cellx = 1, self._width do
-      self._graph:addnode( self:_getcellidx(cellx, celly) )
+      local cellidx = self:_getcellidx( cellx, celly )
+      self._graph:addnode( cellidx )
+      self._cells[cellidx] = false
     end
   end
 
@@ -63,7 +66,63 @@ end
 
 --[[ Public Functions ]]--
 
+function board_t.addpiece( self, piece, cellidx )
+  self._cells[cellidx] = piece
+end
 
+function board_t.removepiece( self, cellidx )
+  self._cells[cellidx] = false
+end
+
+function board_t.movepiece( self, srccellidx, dstcellidx )
+  local piecemoves = self:getpiecemoves( srccellidx )
+
+  if piecemoves[dstcellidx] then
+    self._cells[dstcellidx] = self._cells[srccellidx]
+    self._cells[srccellidx] = false
+  end
+
+  return piecemoves[dstcellidx]
+end
+
+function board_t.getpiecemoves( self, cellidx )
+  local function getpiecemoves( currcell, activesteps, activemaxs, moveiter )
+    local moves = {}
+    if not self._cells[currcell] or #activesteps == 0 then return moves end
+
+    local currnode = self._graph:findnode( currcell )
+    for _, celledge in ipairs( cellnode:getoutedges() ) do
+      local nextcell = celledge:getdst():getlabel()
+      local tonextlabel = celledge:getlabel()
+
+      local nextsteps, nextmaxs = {}, {}
+      for stepidx = 1, #activesteps do
+        local currstep, currmax = activesteps[stepidx], activemaxs[stepidx]
+
+        local currstepidx = ( moveiter % #currstep ) + 1
+        local currstepcount = math.floor( moveiter / #cellstep )
+
+        if moveiter >= #currstep and currstepidx == 1 then
+          moves[currcell] = true
+        end
+
+        if string.match( tonextlabel, currstep[currstepidx] ) and
+            currstepcount < currmax then
+          table.insert( nexsteps, currstep )
+          table.insert( nextmaxs, currmax )
+        end
+      end
+
+      local edgemoves = getpiecemoves( nextcell, nextsteps, nextmaxs, moveiter+1 )
+      for cell in pairs( edgemoves ) do moves[cell] = true end
+    end
+  end
+
+  local cellsteps = self._cells[cellidx] and self._cells[cellidx]._steps or {}
+  local cellstepmaxs = self._cells[cellidx] and self._cells[cellidx]._stepmaxs or {}
+
+  return getstepmoves( cellidx, cellsteps, cellstepmaxs, 0 )
+end
 
 --[[ Private Functions ]]--
 
@@ -80,5 +139,9 @@ function board_t._iscellvalid( self, cellx, celly )
   return util.inrange( cellx, 1, self._width ) and
     util.inrange( celly, 1, self._height )
 end
+
+--[[ Private Classes ]]--
+
+board_t.piece_t = struct( {}, '_board', false, '_steps', {}, '_stepmaxs', {} )
 
 return board_t
