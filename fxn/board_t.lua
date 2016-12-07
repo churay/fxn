@@ -13,16 +13,16 @@ local util = require( 'util' )
 
 --[[ Constructor ]]--
 
-local board_t = struct( {}, '_graph', graph_t(), '_cells', {}, '_width', 0, '_height', 0 )
+local board_t = struct( {}, '_graph', graph_t(), '_cells', {}, 'width', 0, 'height', 0 )
 
 function board_t._init( self, width, height )
   self._graph = graph_t( true, false )
   self._cells = {}
-  self._width, self._height = width, height
+  self.width, self.height = width, height
 
   -- insert all cells into the graph --
-  for celly = 1, self._height do
-    for cellx = 1, self._width do
+  for celly = 1, self.height do
+    for cellx = 1, self.width do
       local cellidx = self:_getcellidx( cellx, celly )
       self._graph:addnode( cellidx )
       self._cells[cellidx] = false
@@ -43,8 +43,8 @@ function board_t._init( self, width, height )
     return label
   end
 
-  for celly = 1, self._height do
-    for cellx = 1, self._width do
+  for celly = 1, self.height do
+    for cellx = 1, self.width do
       local cellidx = self:_getcellidx( cellx, celly )
 
       for celldv = -1, 1, 2 do
@@ -71,7 +71,9 @@ function board_t.addpiece( self, piece, cellidx )
 end
 
 function board_t.removepiece( self, cellidx )
+  local piece = self._cells[cellidx]
   self._cells[cellidx] = false
+  return piece
 end
 
 function board_t.movepiece( self, srccellidx, dstcellidx )
@@ -127,21 +129,21 @@ end
 --[[ Private Functions ]]--
 
 function board_t._getcellidx( self, cellx, celly )
-  return self._width * ( celly - 1 ) + cellx
+  return self.width * ( celly - 1 ) + cellx
 end
 
 function board_t._getcellpos( self, cellidx )
-  return ( (cellidx - 1) % self._width ) + 1,
-    math.floor( (cellidx - 1) / self._width ) + 1
+  return ( (cellidx - 1) % self.width ) + 1,
+    math.floor( (cellidx - 1) / self.width ) + 1
 end
 
 function board_t._iscellvalid( self, cellx, celly )
-  return util.inrange( cellx, 1, self._width ) and
-    util.inrange( celly, 1, self._height )
+  return util.inrange( cellx, 1, self.width ) and
+    util.inrange( celly, 1, self.height )
 end
 
 --[[ Private Classes ]]--
 
-board_t.piece_t = struct( {}, '_board', false, '_steps', {}, '_stepmaxs', {} )
+board_t.piece_t = struct( {}, '_board', false, '_steps', {}, '_maxs', {} )
 
 return board_t
