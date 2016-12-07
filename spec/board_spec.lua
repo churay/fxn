@@ -77,7 +77,63 @@ describe( 'board_t', function()
     end )
   end )
 
+  describe( 'piece manipulation functionality', function()
+    local testpiece = nil
+
+    before_each( function()
+      testpiece = board_t.piece_t( testboard, {}, {} )
+    end )
+
+    it( 'adds pieces to the board at the proper cells', function()
+      for cellidx = 1, testboard.width * testboard.height do
+        testboard:addpiece( testpiece, cellidx )
+        assert.are.equal( testpiece, testboard:getpiece(cellidx) )
+
+        for ocellidx = 1, testboard.width * testboard.height do
+          assert.are.equal(
+            ocellidx <= cellidx and testpiece or false,
+            testboard:getpiece(ocellidx)
+          )
+        end
+      end
+    end )
+
+    it( 'removes pieces from the board at the designated cells, returning ' ..
+        'the proper occupant pieces', function()
+      local testpieces = {}
+      for cellidx = 1, testboard.width * testboard.height do
+        table.insert( testpieces, board_t.piece_t(testboard, {}, {}) )
+        testboard:addpiece( testpieces[cellidx], cellidx )
+      end
+
+      for cellidx = 1, testboard.width * testboard.height do
+        assert.are.equal( testpieces[cellidx], testboard:removepiece(cellidx) )
+
+        for ocellidx = 1, testboard.width * testboard.height do
+          assert.are.equal(
+            ocellidx > cellidx and testpieces[ocellidx] or false,
+            testboard:getpiece(ocellidx)
+          )
+        end
+      end
+    end )
+  end )
+
   describe( 'movement calculation', function()
+    local a = nil
+
+    before_each( function()
+      a = 10
+    end )
+
+    it( 'properly calculates no moves for trivial pieces', function()
+      pending( 'TODO(JRC)' )
+    end )
+
+    it( 'properly calculates no moves for trivial boards', function()
+      pending( 'TODO(JRC)' )
+    end )
+
     it( 'works', function()
       pending( 'TODO(JRC)' )
     end )

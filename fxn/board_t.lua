@@ -76,6 +76,10 @@ function board_t.removepiece( self, cellidx )
   return piece
 end
 
+function board_t.getpiece( self, cellidx )
+  return self._cells[cellidx]
+end
+
 function board_t.movepiece( self, srccellidx, dstcellidx )
   local piecemoves = self:getpiecemoves( srccellidx )
 
