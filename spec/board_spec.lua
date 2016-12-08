@@ -1,6 +1,5 @@
 require( 'bustedext' )
 local board_t = require( 'fxn.board_t' )
-local util = require( 'fxn.util' )
 
 describe( 'board_t', function()
   --[[ Testing Constants ]]--
@@ -134,8 +133,7 @@ describe( 'board_t', function()
         stationary = {},
         up = { {'+y'} },
         upleft = { {'+y', '-x'} },
-        cardinals = { {'[+-][xy]'} },
-        diagonals = { {'+x', '+y'}, {'+x', '-y'}, {'-x', '+y'}, {'-x', '-y'} },
+        diags = { {'+x', '+y'}, {'+x', '-y'}, {'-x', '+y'}, {'-x', '-y'} },
       }
     end )
 
@@ -160,9 +158,12 @@ describe( 'board_t', function()
           local testcellidx = testboard:_getcellidx( testcellx, testcelly )
 
           local expectedmoves = {}
-          for dy = 1, util.clamp( testboard.height-testcelly, 0, 2 ) do
-            local expectedidx = testboard:_getcellidx( testcellx, testcelly+dy )
-            expectedmoves[expectedidx] = true
+          for dy = 1, 2 do
+            local expcellx, expcelly = testcellx, testcelly+dy
+            if testboard:_iscellvalid( expcellx, expcelly ) then
+              local expectedidx = testboard:_getcellidx( expcellx, expcelly )
+              expectedmoves[expectedidx] = true
+            end
           end
 
           testboard:addpiece( testpiece, testcellidx )
@@ -173,8 +174,53 @@ describe( 'board_t', function()
     end )
 
     it( 'properly calculates moves for multiple substep steps', function()
-      pending( 'TODO(JRC)' )
       local testpiece = board_t.piece_t( testboard, testmoves.upleft, {2} )
+
+      for testcellx = 1, testboard.width do
+        for testcelly = 1, testboard.height do
+          local testcellidx = testboard:_getcellidx( testcellx, testcelly )
+
+          local expectedmoves = {}
+          for dxy = 1, 2 do
+            local expcellx, expcelly = testcellx-dxy, testcelly+dxy
+            if testboard:_iscellvalid( expcellx, expcelly ) then
+              local expectedidx = testboard:_getcellidx( expcellx, expcelly )
+              expectedmoves[expectedidx] = true
+            end
+          end
+
+          testboard:addpiece( testpiece, testcellidx )
+          assert.are.same( expectedmoves, testboard:getpiecemoves(testcellidx) )
+          testboard:removepiece( testcellidx )
+        end
+      end
+    end )
+
+    -- TODO(JRC): Improve this test case so there are different maxs for the
+    -- different step sequences.
+    it( 'properly calculates moves for steps with multiple options', function()
+      local testpiece = board_t.piece_t( testboard, testmoves.diags, {1,1,1,1} )
+
+      for testcellx = 1, testboard.width do
+        for testcelly = 1, testboard.height do
+          local testcellidx = testboard:_getcellidx( testcellx, testcelly )
+
+          local expectedmoves = {}
+          for dx = -1, 1, 2 do
+            for dy = -1, 1, 2 do
+              local expcellx, expcelly = testcellx+dx, testcelly+dy
+              if testboard:_iscellvalid( expcellx, expcelly ) then
+                local expectedidx = testboard:_getcellidx( expcellx, expcelly )
+                expectedmoves[expectedidx] = true
+              end
+            end
+          end
+
+          testboard:addpiece( testpiece, testcellidx )
+          assert.are.same( expectedmoves, testboard:getpiecemoves(testcellidx) )
+          testboard:removepiece( testcellidx )
+        end
+      end
     end )
   end )
 
