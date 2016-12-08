@@ -1,5 +1,6 @@
 require( 'bustedext' )
 local board_t = require( 'fxn.board_t' )
+local util = require( 'fxn.util' )
 
 describe( 'board_t', function()
   --[[ Testing Constants ]]--
@@ -132,7 +133,7 @@ describe( 'board_t', function()
       testmoves = {
         stationary = {},
         up = { {'+y'} },
-        upleft = { {'+y', '+x'} },
+        upleft = { {'+y', '-x'} },
         cardinals = { {'[+-][xy]'} },
         diagonals = { {'+x', '+y'}, {'+x', '-y'}, {'-x', '+y'}, {'-x', '-y'} },
       }
@@ -152,22 +153,28 @@ describe( 'board_t', function()
     end )
 
     it( 'properly calculates moves for single substep steps', function()
-      local testpiece = board_t.piece_t( testboard, testmoves.up, {1} )
+      local testpiece = board_t.piece_t( testboard, testmoves.up, {2} )
 
       for testcellx = 1, testboard.width do
         for testcelly = 1, testboard.height do
           local testcellidx = testboard:_getcellidx( testcellx, testcelly )
-          local upcellidx = testboard:_getcellidx( testcellx, testcelly+1 )
+
+          local expectedmoves = {}
+          for dy = 1, util.clamp( testboard.height-testcelly, 0, 2 ) do
+            local expectedidx = testboard:_getcellidx( testcellx, testcelly+dy )
+            expectedmoves[expectedidx] = true
+          end
 
           testboard:addpiece( testpiece, testcellidx )
-          local d = testboard:getpiecemoves(testcellidx)
-          assert.are.equalsets(
-            testcelly ~= testboard.height and {[upcellidx]=true} or {},
-            testboard:getpiecemoves(testcellidx)
-          )
+          assert.are.same( expectedmoves, testboard:getpiecemoves(testcellidx) )
           testboard:removepiece( testcellidx )
         end
       end
+    end )
+
+    it( 'properly calculates moves for multiple substep steps', function()
+      pending( 'TODO(JRC)' )
+      local testpiece = board_t.piece_t( testboard, testmoves.upleft, {2} )
     end )
   end )
 
