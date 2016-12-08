@@ -199,6 +199,11 @@ function graph_t.node_t.__eq( self, other )
   return self._graph == other._graph and self._nid == other._nid
 end
 
+function graph_t.node_t.__tostring( self )
+  -- TODO(JRC): Improve the implementation of this function.
+  return self:getlabel()
+end
+
 function graph_t.node_t.getid( self )
   return table.concat( {'@', tostring(self._nid)} )
 end
@@ -228,6 +233,11 @@ graph_t.edge_t = struct( {}, '_graph', false, '_srcnid', false, '_dstnid', false
 function graph_t.edge_t.__eq( self, other )
   return self._graph == other._graph and self._srcnid == other._srcnid and
     self._dstnid == other._dstnid
+end
+
+function graph_t.edge_t.__tostring( self )
+  -- TODO(JRC): Improve the implementation of this function.
+  return self:getlabel()
 end
 
 function graph_t.edge_t.getid( self )

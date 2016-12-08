@@ -92,12 +92,12 @@ function board_t.movepiece( self, srccellidx, dstcellidx )
 end
 
 function board_t.getpiecemoves( self, cellidx )
-  local function getpiecemoves( currcell, activesteps, activemaxs, moveiter )
+  local function getmoves( currcell, activesteps, activemaxs, moveiter )
     local moves = {}
-    if not self._cells[currcell] or #activesteps == 0 then return moves end
+    if not self:_iscellvalid( cellidx ) or #activesteps == 0 then return moves end
 
     local currnode = self._graph:findnode( currcell )
-    for _, celledge in ipairs( cellnode:getoutedges() ) do
+    for _, celledge in ipairs( currnode:getoutedges() ) do
       local nextcell = celledge:getdst():getlabel()
       local tonextlabel = celledge:getlabel()
 
@@ -106,7 +106,7 @@ function board_t.getpiecemoves( self, cellidx )
         local currstep, currmax = activesteps[stepidx], activemaxs[stepidx]
 
         local currstepidx = ( moveiter % #currstep ) + 1
-        local currstepcount = math.floor( moveiter / #cellstep )
+        local currstepcount = math.floor( moveiter / #currstep )
 
         if moveiter >= #currstep and currstepidx == 1 then
           moves[currcell] = true
@@ -114,20 +114,22 @@ function board_t.getpiecemoves( self, cellidx )
 
         if string.match( tonextlabel, currstep[currstepidx] ) and
             currstepcount < currmax then
-          table.insert( nexsteps, currstep )
+          table.insert( nextsteps, currstep )
           table.insert( nextmaxs, currmax )
         end
       end
 
-      local edgemoves = getpiecemoves( nextcell, nextsteps, nextmaxs, moveiter+1 )
+      local edgemoves = getmoves( nextcell, nextsteps, nextmaxs, moveiter+1 )
       for cell in pairs( edgemoves ) do moves[cell] = true end
     end
+
+    return moves
   end
 
   local cellsteps = self._cells[cellidx] and self._cells[cellidx]._steps or {}
-  local cellstepmaxs = self._cells[cellidx] and self._cells[cellidx]._stepmaxs or {}
+  local cellstepmaxs = self._cells[cellidx] and self._cells[cellidx]._maxs or {}
 
-  return getstepmoves( cellidx, cellsteps, cellstepmaxs, 0 )
+  return getmoves( cellidx, cellsteps, cellstepmaxs, 0 )
 end
 
 --[[ Private Functions ]]--
@@ -142,6 +144,7 @@ function board_t._getcellpos( self, cellidx )
 end
 
 function board_t._iscellvalid( self, cellx, celly )
+  if celly == nil then cellx, celly = self:_getcellpos( cellx ) end
   return util.inrange( cellx, 1, self.width ) and
     util.inrange( celly, 1, self.height )
 end

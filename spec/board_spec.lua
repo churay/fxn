@@ -4,7 +4,7 @@ local board_t = require( 'fxn.board_t' )
 describe( 'board_t', function()
   --[[ Testing Constants ]]--
 
-  local BOARD_DIMS = { 3, 3 }
+  local BOARD_DIMS = { 5, 5 }
 
   --[[ Testing Variables ]]--
 
@@ -16,18 +16,22 @@ describe( 'board_t', function()
       --[[
       --  Test Board Diagram
       --
-      --  O----------------> X
-      --  |     1   2   3
-      --  |   |---+---+---|
-      --  | 1 | 1 | 2 | 3 |
-      --  |   |---+---+---|
-      --  | 2 | 4 | 5 | 6 |
-      --  |   |---+---+---|
-      --  | 3 | 7 | 8 | 9 |
-      --  |   |---+---+---|
-      --  V
-      --
       --  Y
+      --  ^
+      --  |   |---+---+---+---+---|
+      --  | 5 | 21| 22| 23| 24| 25|
+      --  |   |---+---+---+---+---|
+      --  | 4 | 16| 17| 18| 19| 20|
+      --  |   |---+---+---+---+---|
+      --  | 3 | 11| 12| 13| 14| 15|
+      --  |   |---+---+---+---+---|
+      --  | 2 | 6 | 7 | 8 | 9 | 10|
+      --  |   |---+---+---+---+---|
+      --  | 1 | 1 | 2 | 3 | 4 | 5 |
+      --  |   |---+---+---+---+---|
+      --  |     1   2   3   4   5
+      --  O------------------------>X
+      --
       --]]
     testboard = board_t( BOARD_DIMS[1], BOARD_DIMS[2] )
   end )
@@ -41,7 +45,7 @@ describe( 'board_t', function()
     end )
 
     it( 'properly initializes cell contents of the board', function()
-      assert.are.equal( BOARD_DIMS[1]*BOARD_DIMS[2], #testboard._cells )
+      assert.are.equal( testboard.width*testboard.height, #testboard._cells )
 
       for cellidx = 1, #testboard._cells do
         assert.are.equal( false, testboard._cells[cellidx] )
@@ -50,7 +54,7 @@ describe( 'board_t', function()
 
     it( 'properly initializes the underlying graph for the board', function()
       local boardcells = testboard._graph:querynodes()
-      assert.are.equal( BOARD_DIMS[1]*BOARD_DIMS[2], #boardcells )
+      assert.are.equal( testboard.width*testboard.height, #boardcells )
 
       for _, boardcell in ipairs( boardcells ) do
         local cellidx = boardcell:getlabel()
@@ -59,11 +63,11 @@ describe( 'board_t', function()
         local expectedouts = {}
         if cellx > 1 then
           expectedouts['-x'] = testboard:_getcellidx(cellx-1, celly)
-        end if cellx < BOARD_DIMS[1] then
+        end if cellx < testboard.width then
           expectedouts['+x'] = testboard:_getcellidx(cellx+1, celly)
         end if celly > 1 then
           expectedouts['-y'] = testboard:_getcellidx(cellx, celly-1)
-        end if celly < BOARD_DIMS[2] then
+        end if celly < testboard.height then
           expectedouts['+y'] = testboard:_getcellidx(cellx, celly+1)
         end
 
@@ -120,22 +124,50 @@ describe( 'board_t', function()
   end )
 
   describe( 'movement calculation', function()
-    local a = nil
+    local testcellidx = nil
+    local testmoves = nil
 
     before_each( function()
-      a = 10
+      testcellidx = testboard:_getcellidx( 2, 2 )
+      testmoves = {
+        stationary = {},
+        up = { {'+y'} },
+        upleft = { {'+y', '+x'} },
+        cardinals = { {'[+-][xy]'} },
+        diagonals = { {'+x', '+y'}, {'+x', '-y'}, {'-x', '+y'}, {'-x', '-y'} },
+      }
+    end )
+
+    it( 'properly calculates no moves for missing pieces', function()
+      for cellidx = 1, testboard.width * testboard.height do
+        assert.are.same( {}, testboard:getpiecemoves(cellidx) )
+      end
     end )
 
     it( 'properly calculates no moves for trivial pieces', function()
-      pending( 'TODO(JRC)' )
+      local testpiece = board_t.piece_t( testboard, testmoves.stationary, {} )
+      testboard:addpiece( testpiece, testcellidx )
+
+      assert.are.same( {}, testboard:getpiecemoves(testcellidx) )
     end )
 
-    it( 'properly calculates no moves for trivial boards', function()
-      pending( 'TODO(JRC)' )
-    end )
+    it( 'properly calculates moves for single substep steps', function()
+      local testpiece = board_t.piece_t( testboard, testmoves.up, {1} )
 
-    it( 'works', function()
-      pending( 'TODO(JRC)' )
+      for testcellx = 1, testboard.width do
+        for testcelly = 1, testboard.height do
+          local testcellidx = testboard:_getcellidx( testcellx, testcelly )
+          local upcellidx = testboard:_getcellidx( testcellx, testcelly+1 )
+
+          testboard:addpiece( testpiece, testcellidx )
+          local d = testboard:getpiecemoves(testcellidx)
+          assert.are.equalsets(
+            testcelly ~= testboard.height and {[upcellidx]=true} or {},
+            testboard:getpiecemoves(testcellidx)
+          )
+          testboard:removepiece( testcellidx )
+        end
+      end
     end )
   end )
 
