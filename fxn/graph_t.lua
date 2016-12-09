@@ -18,24 +18,21 @@ local graph_t = struct( {},
 
 function graph_t.__tostring( self )
   local graphstr = {}
+  table.insert( graphstr, table.concat({'Graph {',
+    self._nlabelsunique and 'U' or 'D', '|',
+    self._elabelsunique and 'U' or 'D', '} [',
+    tostring(#self:querynodes()), '|',
+    tostring(#self:queryedges()), ']:' }, '') )
 
-  local headerstr = { 'Graph {', '', '|', '', '} [', '', '|', '', ']:' }
-  headerstr[2] = self._nlabelsunique and 'U' or 'D'
-  headerstr[4] = self._elabelsunique and 'U' or 'D'
-  headerstr[6] = tostring( #self:querynodes() )
-  headerstr[8] = tostring( #self:queryedges() )
-  table.insert( graphstr, table.concat(headerstr, '') )
-
-  for nid, nlabel in pairs( self._nodes ) do
-    local nodestr = { '  ', nlabel, ' [', nid, ']' }
-    local edgestr = {}
-    for did, elabel in pairs( self._edges.labels[nid] ) do
-      local nodestr = self._nodes[did] .. ' [' .. did .. ']'
-      table.insert( edgestr, '( ' .. elabel .. ', ' .. nodestr .. ')' )
+  for _, node in ipairs( self:querynodes() ) do
+    local nodestr, edgestr = { '  ', tostring(node) }, {}
+    for _, oedge in ipairs( node:getoutedges() ) do
+      table.insert( edgestr, tostring(oedge) )
     end
 
-    nodestr, edgestr = table.concat( nodestr, '' ), table.concat( edgestr, ', ' )
-    table.insert( graphstr, table.concat({nodestr, ' : { ', edgestr, ' }'}) )
+    table.insert( graphstr, table.concat({'  ',
+      table.concat(nodestr, ''), ' : [ ',
+      table.concat(edgestr, ', '), ' ]'}) )
   end
 
   return table.concat( graphstr, '\n' )
@@ -200,8 +197,7 @@ function graph_t.node_t.__eq( self, other )
 end
 
 function graph_t.node_t.__tostring( self )
-  -- TODO(JRC): Improve the implementation of this function.
-  return self:getlabel()
+  return table.concat( {'"', tostring(self:getlabel()), '"', self:getid()} )
 end
 
 function graph_t.node_t.getid( self )
@@ -236,8 +232,7 @@ function graph_t.edge_t.__eq( self, other )
 end
 
 function graph_t.edge_t.__tostring( self )
-  -- TODO(JRC): Improve the implementation of this function.
-  return self:getlabel()
+  return table.concat( {'"', tostring(self:getlabel()), '"', self:getid()} )
 end
 
 function graph_t.edge_t.getid( self )
