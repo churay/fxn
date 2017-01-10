@@ -1,4 +1,5 @@
 local struct = require( 'struct' )
+local util = require( 'util' )
 
 --[[ Constructor ]]--
 
@@ -36,7 +37,7 @@ function vector_t.__eq( self, vector )
 end
 
 function vector_t.__tostring( self )
-  return "< " .. self.x .. ", " .. self.y .. " >"
+  return "<" .. self.x .. ", " .. self.y .. ">"
 end
 
 --[[ Public Functions ]]--
@@ -61,7 +62,9 @@ end
 
 function vector_ipfxns.project( self, vector )
   -- a->b = (|a|cos(t)/|b|) * b ==> (a.b/b.b) * b
-  self:mulip( self:dot(vector) / vector:dot(vector) )
+  local projscale = self:dot( vector ) / vector:dot( vector )
+  self.x, self.y = vector.x, vector.y
+  self:mulip( projscale )
 end
 
 function vector_t.xy( self )
@@ -70,15 +73,22 @@ end
 
 --[[ In-Place Functions ]]--
 
+-- NOTE(JRC): This could be improved by removing the 'vector_ipfxn' table and
+-- auto-detecting the correct set of in-place by performing tests and identifying
+-- all functions that return a 'vector_t' instance when passed default arguments.
+
 for fxnname, ipfxn in pairs( vector_ipfxns ) do
-  local ipname = string.sub( string.match(fxnname, '__.*') and 3 or 1 ) .. 'ip'
+  local ipname = string.sub( fxnname, string.match(fxnname, '__.*') and 3 or 1 )
   local opname = fxnname
 
-  vector_t[ipname] = ipfxn
+  vector_t[ipname .. 'ip'] = ipfxn
   vector_t[opname] = function( ... )
     local args = { ... }
-    local copy = util.copy( table.remove(args, 1) )
-    return ipfxn( copy, args )
+    local self = table.remove( args, getmetatable(args[1]) == vector_t and 1 or 2 )
+
+    local copy = vector_t( self.x, self.y )
+    ipfxn( copy, util.unpack(args) )
+    return copy
   end
 end
 
