@@ -145,7 +145,7 @@ function board_t.render( self )
   local gfxdirtypes = { [0]='impassable', [1]='passable' }
 
   local gfxcellw, gfxcellh = 1.0 / self.width, 1.0 / self.height
-  local gfxedgelen = 1e-1
+  local gfxedgelen, gfxgridlen = 5e-2, 5e-3
 
   for celly = 1, self.height do
     for cellx = 1, self.width do
@@ -179,6 +179,9 @@ function board_t.render( self )
         love.graphics.setColor( util.unpack(dircolor) )
         love.graphics.polygon( 'fill', 0.0, 0.0, 1.0, 0.0,
           1.0 - gfxedgelen, gfxedgelen, gfxedgelen, gfxedgelen )
+        love.graphics.setColor( util.unpack(colors.red) )
+        love.graphics.polygon( 'fill', 0.0, 0.0, 1.0, 0.0,
+          1.0, gfxgridlen, 0.0, gfxgridlen )
 
         love.graphics.translate( 1.0, 0.0 )
         love.graphics.rotate( gfxcornerrads )
@@ -187,7 +190,6 @@ function board_t.render( self )
       love.graphics.pop()
     end
   end
-
 end
 
 --[[ Private Functions ]]--

@@ -44,9 +44,7 @@ end
 
 function love.load()
   func = fxn.func_t( function(x) return math.sin(x) end )
-
-  board = fxn.board_t( 2, 2 )
-  print( tostring(board._graph) )
+  board = fxn.board_t( 10, 10 )
 end
 
 function love.keypressed( key, scancode, isrepeat )
