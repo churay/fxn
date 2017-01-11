@@ -1,5 +1,6 @@
 local struct = require( 'struct' )
 local graph_t = require( 'graph_t' )
+local colors = require( 'colors' )
 local util = require( 'util' )
 
 -- TODO(JRC): This code could be extended in to make more general types of
@@ -64,7 +65,7 @@ function board_t._init( self, width, height )
   end
 end
 
---[[ Public Functions ]]--
+--[[ Public Data Functions ]]--
 
 function board_t.addpiece( self, piece, cellidx )
   self._cells[cellidx] = piece
@@ -130,6 +131,63 @@ function board_t.getpiecemoves( self, cellidx )
   local cellstepmaxs = self._cells[cellidx] and self._cells[cellidx]._maxs or {}
 
   return getmoves( cellidx, cellsteps, cellstepmaxs, 0 )
+end
+
+--[[ Public Render Functions ]]--
+
+-- TODO(JRC): Update this function based on the decisions made for the rendering
+-- function interface.
+function board_t.render( self )
+  -- TODO(JRC): The ordering here is a bit hacky and should be removed in the
+  -- general 'board_t' version.  These labels should be replaced by incremental
+  -- numbers instead with the lowest-lest edge is 0 and increments of 1 CCW.
+  local celldirorder = { '-y', '+x', '+y', '-x' }
+  local gfxdirtypes = { [0]='impassable', [1]='passable' }
+
+  local gfxcellw, gfxcellh = 1.0 / self.width, 1.0 / self.height
+  local gfxedgelen = 1e-1
+
+  for celly = 1, self.height do
+    for cellx = 1, self.width do
+      local cellidx = self:_getcellidx( cellx, celly )
+      local celloutedges = self._graph:findnode( cellidx ):getoutedges()
+
+      local celldirbag = {}
+      for _, celldir in ipairs( celldirorder ) do celldirbag[celldir] = 1 end
+
+      -- celldirtypes: { direction label => cell direction type } for each direction
+      local celldirtypes = {}
+      for _, celloutedge in ipairs( celloutedges ) do
+        local edgedir = celloutedge:getlabel()
+        celldirtypes[edgedir] = 1
+        celldirbag[edgedir] = nil
+      end
+
+      for noedgedir in pairs( celldirbag ) do celldirtypes[noedgedir] = 0 end
+
+      local gfxcellx, gfxcelly = (cellx - 1) * gfxcellw, (celly - 1) * gfxcellw
+      local gfxcornerrads = ( 2 * math.pi ) / util.len( celldirtypes )
+
+      love.graphics.push()
+      love.graphics.translate( gfxcellx, gfxcelly )
+      love.graphics.scale( gfxcellw, gfxcellh )
+
+      for _, celldir in ipairs( celldirorder ) do
+        local dircolor = util.copy( colors.black )
+        table.insert( dircolor, celldirtypes[celldir] == 0 and 255 or 64 )
+
+        love.graphics.setColor( util.unpack(dircolor) )
+        love.graphics.polygon( 'fill', 0.0, 0.0, 1.0, 0.0,
+          1.0 - gfxedgelen, gfxedgelen, gfxedgelen, gfxedgelen )
+
+        love.graphics.translate( 1.0, 0.0 )
+        love.graphics.rotate( gfxcornerrads )
+      end
+
+      love.graphics.pop()
+    end
+  end
+
 end
 
 --[[ Private Functions ]]--

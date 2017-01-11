@@ -66,6 +66,21 @@ function love.draw()
     love.graphics.scale( 1.0, -1.0 )
   end
 
+  board:render()
+
+  --[[
+  -- TODO(JRC): Figure out how each individual entity will be rendered
+  -- (i.e. the arguments they'll take and configuration they'll allow).
+  do -- render all entities
+    for _, entity in ipairs( entities ) do
+      love.graphics.push()
+      entity:render()
+      love.graphics.pop()
+    end
+  end
+  --]]
+
+  --[[
   do -- plot example function
     -- TODO(JRC): Adjust the number of sampling points based on the
     -- dimensions of the rendering window (fewer points for smaller space).
@@ -81,7 +96,7 @@ function love.draw()
     -- by taking the function derivatives and finding their zero points.
     local plresultmin, plresultmax = -1.0, 1.0
     -- TODO(JRC): Consider adjusting these based on the size of the display.
-    local pltickxnum, pltickynum= 10, 10
+    local pltickxnum, pltickynum = 10, 10
 
     local ploriginx, ploriginy = 1e-1, 0e0
     local plpad = 3e-2
@@ -154,6 +169,7 @@ function love.draw()
       love.graphics.circle( 'fill', plmousex, plmousefuncy, 0.01 )
     end
   end
+  --]]
 
   love.graphics.pop()
 end
