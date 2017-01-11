@@ -44,7 +44,7 @@ end
 
 function love.load()
   func = fxn.func_t( function(x) return math.sin(x) end )
-  board = fxn.board_t( 10, 10 )
+  board = fxn.board_t( 4, 4 )
 end
 
 function love.keypressed( key, scancode, isrepeat )
@@ -64,7 +64,9 @@ function love.draw()
     love.graphics.scale( 1.0, -1.0 )
   end
 
-  board:render()
+  local mousex, mousey = love.graphics.transform( mouse.x, mouse.y, true )
+  love.graphics.push() board:render() love.graphics.pop()
+  love.graphics.push() board:rendercell( mousex, mousey ) love.graphics.pop()
 
   --[[
   -- TODO(JRC): Figure out how each individual entity will be rendered

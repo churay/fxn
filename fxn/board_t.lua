@@ -192,6 +192,23 @@ function board_t.render( self )
   end
 end
 
+function board_t.rendercell( self, cellx, celly )
+  local gfxcellw, gfxcellh = 1.0 / self.width, 1.0 / self.height
+  local gfxedgelen, gfxgridlen = 5e-2, 5e-3
+
+  local gfxcellx = math.floor( self.width * cellx ) / self.width
+  local gfxcelly = math.floor( self.height * celly ) / self.height
+
+  love.graphics.translate( gfxcellx, gfxcelly )
+  love.graphics.scale( gfxcellw, gfxcellh )
+
+  love.graphics.setColor( util.unpack(colors.green) )
+  love.graphics.polygon( 'fill', gfxedgelen, gfxedgelen,
+    1.0 - gfxedgelen, gfxedgelen,
+    1.0 - gfxedgelen, 1.0 - gfxedgelen,
+    gfxedgelen, 1.0 - gfxedgelen )
+end
+
 --[[ Private Functions ]]--
 
 function board_t._getcellidx( self, cellx, celly )
