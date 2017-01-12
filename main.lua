@@ -1,10 +1,20 @@
 local fxn = require( 'fxn' )
 love.ext = require( 'loveext' )
--- local dbg = require( 'debugger' )
 
-local func = nil
-local board = nil
-local mouse = { x=0, y=0 }
+local state = {
+  func = 0,
+  board = 0
+}
+
+local input = {
+  mouse = { x=0, y=0 }
+}
+
+local meta = {
+  avgfps = 0,
+  framenum = 1,
+  showstats = true,
+}
 
 function love.run()
   math.randomseed( os.time() )
@@ -43,16 +53,18 @@ function love.run()
 end
 
 function love.load()
-  func = fxn.func_t( function(x) return math.sin(x) end )
-  board = fxn.board_t( 10, 10 )
+  state.func = fxn.func_t( function(x) return math.sin(x) end )
+  state.board = fxn.board_t( 10, 10 )
 end
 
 function love.keypressed( key, scancode, isrepeat )
+  if key == 'd' then meta.showstats = not meta.showstats end
   if key == 'q' then love.event.quit() end
 end
 
 function love.update( dt )
-  mouse.x, mouse.y = love.mouse.getPosition()
+  input.mouse.x, input.mouse.y = love.mouse.getPosition()
+  meta.framenum = meta.framenum + 1
 end
 
 function love.draw()
@@ -64,9 +76,9 @@ function love.draw()
     love.graphics.scale( 1.0, -1.0 )
   end
 
-  local mousex, mousey = love.graphics.itransform( mouse.x, mouse.y )
-  love.graphics.push() board:render() love.graphics.pop()
-  love.graphics.push() board:rendercell( mousex, mousey ) love.graphics.pop()
+  local mousex, mousey = love.graphics.itransform( input.mouse.x, input.mouse.y )
+  love.graphics.push() state.board:render() love.graphics.pop()
+  love.graphics.push() state.board:rendercell( mousex, mousey ) love.graphics.pop()
 
   --[[
   -- TODO(JRC): Figure out how each individual entity will be rendered
@@ -124,7 +136,7 @@ function love.draw()
       for sidx = 1, plsamplenum do
         local sratio = ( sidx - 1 ) / ( plsamplenum - 1 )
         local sx = plsamplemin + ( plsamplemax - plsamplemin ) * sratio
-        local sy = func( sx )
+        local sy = state.func( sx )
         table.insert( samples, sx ); table.insert( samples, sy )
       end
       love.graphics.setColor( unpack(fxn.colors.dgray) )
@@ -145,7 +157,7 @@ function love.draw()
         local smidx = plsamplemin + ( plsamplemax - plsamplemin ) * smidrx
 
         local szeroy = ( plresultmax + plresultmin ) / 2.0
-        local smidy = func( smidx )
+        local smidy = state.func( smidx )
 
         love.graphics.polygon( 'line', sminx, szeroy, smaxx, szeroy,
           smaxx, smidy, sminx, smidy )
@@ -157,11 +169,11 @@ function love.draw()
       love.graphics.translate( ploriginx, ploriginy )
       love.graphics.scale( plscalex, plscaley )
 
-      local plmousex, plmousey = love.graphics.itransform( mouse.x, mouse.y )
+      local plmousex, plmousey = love.graphics.itransform( input.mouse.x, input.mouse.y )
       love.graphics.setColor( unpack(fxn.colors.red) )
       love.graphics.line( plmousex, plresultmin, plmousex, plresultmax )
 
-      local plmousefuncy = func( plmousex )
+      local plmousefuncy = state.func( plmousex )
       plmousex, plmousefuncy = love.graphics.transform( plmousex, plmousefuncy )
       love.graphics.pop()
       plmousex, plmousefuncy = love.graphics.itransform( plmousex, plmousefuncy )
@@ -170,6 +182,20 @@ function love.draw()
     end
   end
   --]]
+
+  if meta.showstats then -- display the game statistics hud
+    local fbasex, fbasey = 1e-2, 1.0 - 1e-2
+    local fscalex, fscaley = love.graphics.itransform( 2.0, 2.0, false )
+
+    local stats = {
+      'Frame #: ' .. meta.framenum,
+    }
+
+    love.graphics.setColor( fxn.util.unpack(fxn.colors.dgray) )
+    for statidx, stat in ipairs( stats ) do
+      love.graphics.print( stat, fbasex, fbasey, 0, fscalex, fscaley )
+    end
+  end
 
   love.graphics.pop()
 end
