@@ -187,20 +187,28 @@ function love.draw()
 
   if meta.showstats then -- display the game statistics hud
     local stats = {
-      'Frame #: ' .. meta.framenum,
-      'FPS: ' .. meta.avgfps,
+      string.format( 'Frame #: %d', meta.framenum ),
+      string.format( 'FPS: %.2f', meta.avgfps ),
     }
 
     local font = love.graphics.getFont()
     local fbasex, fbasey = 1e-2, 1.0 - 1e-2
-    local fscalex, fscaley = love.graphics.itransform( 2.0, 2.0, false )
-    local _, fheight = love.graphics.itransform( 0.0, font:getHeight(), false )
+    local fscalex, fscaley = love.graphics.itransform( 2.0, 2.0, true )
+    local _, fheight = love.graphics.itransform( 0.0, 2.0*font:getHeight(), true )
+    function getstatxy( sidx ) return fbasex, fbasey + fheight * ( sidx - 1 ) end
 
-    love.graphics.setColor( fxn.util.unpack(fxn.colors.dgray) )
     for statidx, stat in ipairs( stats ) do
-      love.graphics.print( stat,
-        fbasex, fbasey + ( 2.0 * fheight ) * (statidx - 1),
-        0, fscalex, fscaley )
+      local statwidth = love.graphics.itransform( 2.0*font:getWidth(stat), 0.0, true )
+      local statx, staty = getstatxy( statidx )
+      local nstatx, nstaty = getstatxy( statidx + 1 )
+
+      love.graphics.setColor( 177, 177, 177, 180 )
+      love.graphics.polygon( 'fill',
+        statx, staty, statx + statwidth, staty,
+        statx + statwidth, nstaty, statx, nstaty )
+
+      love.graphics.setColor( 77, 77, 77, 180 )
+      love.graphics.print( stat, statx, staty, 0, fscalex, fscaley )
     end
   end
 

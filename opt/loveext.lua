@@ -151,17 +151,17 @@ for lgfname, lgfext in pairs( lgexts ) do
   end
 end
 
-function love.graphics.transform( posx, posy, affine )
-  local affine = affine == nil and true or affine
-  local vpos = { posx, posy, affine and 1.0 or 0.0 }
+function love.graphics.transform( posx, posy, linear )
+  local linear = linear or false
+  local vpos = { posx, posy, linear and 0.0 or 1.0 }
 
   local vres = getvecmult( lgxform, vpos )
   return vres[1], vres[2]
 end
 
-function love.graphics.itransform( posx, posy, affine )
-  local affine = affine == nil and true or affine
-  local vpos = { posx, posy, affine and 1.0 or 0.0 }
+function love.graphics.itransform( posx, posy, linear )
+  local linear = linear or false
+  local vpos = { posx, posy, linear and 0.0 or 1.0 }
 
   local vres = getvecmult( getmatinv(lgxform), vpos )
   return vres[1], vres[2]
