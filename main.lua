@@ -44,7 +44,7 @@ end
 
 function love.load()
   func = fxn.func_t( function(x) return math.sin(x) end )
-  board = fxn.board_t( 4, 4 )
+  board = fxn.board_t( 10, 10 )
 end
 
 function love.keypressed( key, scancode, isrepeat )
@@ -64,7 +64,7 @@ function love.draw()
     love.graphics.scale( 1.0, -1.0 )
   end
 
-  local mousex, mousey = love.graphics.transform( mouse.x, mouse.y, true )
+  local mousex, mousey = love.graphics.itransform( mouse.x, mouse.y )
   love.graphics.push() board:render() love.graphics.pop()
   love.graphics.push() board:rendercell( mousex, mousey ) love.graphics.pop()
 
@@ -157,14 +157,14 @@ function love.draw()
       love.graphics.translate( ploriginx, ploriginy )
       love.graphics.scale( plscalex, plscaley )
 
-      local plmousex, plmousey = love.graphics.transform( mouse.x, mouse.y, true )
+      local plmousex, plmousey = love.graphics.itransform( mouse.x, mouse.y )
       love.graphics.setColor( unpack(fxn.colors.red) )
       love.graphics.line( plmousex, plresultmin, plmousex, plresultmax )
 
       local plmousefuncy = func( plmousex )
       plmousex, plmousefuncy = love.graphics.transform( plmousex, plmousefuncy )
       love.graphics.pop()
-      plmousex, plmousefuncy = love.graphics.transform( plmousex, plmousefuncy, true )
+      plmousex, plmousefuncy = love.graphics.itransform( plmousex, plmousefuncy )
 
       love.graphics.circle( 'fill', plmousex, plmousefuncy, 0.01 )
     end

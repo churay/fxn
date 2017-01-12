@@ -24,6 +24,18 @@ local function getmatmult( mlhs, mrhs )
   return mres
 end
 
+local function getvecmult( mlhs, vrhs )
+  local vres = { 0.0, 0.0, 0.0 }
+
+  for ridx = 1, 3 do
+    local e = 0
+    for eidx = 1, 3 do e = e + mlhs[getmatidx(ridx, eidx)] * vrhs[eidx] end
+    vres[ridx] = e
+  end
+
+  return vres
+end
+
 local function getmatinv( mat )
   local maug = {
     mat[1], mat[2], mat[3], 1.0, 0.0, 0.0,
@@ -139,17 +151,19 @@ for lgfname, lgfext in pairs( lgexts ) do
   end
 end
 
-function love.graphics.transform( posx, posy, inverse )
-  local inverse = inverse or false
-  local vrhs, vres = { posx, posy, 1.0 }, { 0.0, 0.0, 0.0 }
+function love.graphics.transform( posx, posy, affine )
+  local affine = affine == nil and true or affine
+  local vpos = { posx, posy, affine and 1.0 or 0.0 }
 
-  local xform = inverse and getmatinv( lgxform ) or lgxform
-  for ridx = 1, 3 do
-    local e = 0
-    for eidx = 1, 3 do e = e + xform[getmatidx(ridx, eidx)] * vrhs[eidx] end
-    vres[ridx] = e
-  end
+  local vres = getvecmult( lgxform, vpos )
+  return vres[1], vres[2]
+end
 
+function love.graphics.itransform( posx, posy, affine )
+  local affine = affine == nil and true or affine
+  local vpos = { posx, posy, affine and 1.0 or 0.0 }
+
+  local vres = getvecmult( getmatinv(lgxform), vpos )
   return vres[1], vres[2]
 end
 
