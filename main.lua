@@ -11,8 +11,8 @@ local input = {
 }
 
 local meta = {
-  avgfps = 0,
   framenum = 1,
+  avgfps = 0,
   showstats = true,
 }
 
@@ -64,7 +64,9 @@ end
 
 function love.update( dt )
   input.mouse.x, input.mouse.y = love.mouse.getPosition()
+
   meta.framenum = meta.framenum + 1
+  meta.avgfps = 1 / dt
 end
 
 function love.draw()
@@ -184,16 +186,21 @@ function love.draw()
   --]]
 
   if meta.showstats then -- display the game statistics hud
-    local fbasex, fbasey = 1e-2, 1.0 - 1e-2
-    local fscalex, fscaley = love.graphics.itransform( 2.0, 2.0, false )
-
     local stats = {
       'Frame #: ' .. meta.framenum,
+      'FPS: ' .. meta.avgfps,
     }
+
+    local font = love.graphics.getFont()
+    local fbasex, fbasey = 1e-2, 1.0 - 1e-2
+    local fscalex, fscaley = love.graphics.itransform( 2.0, 2.0, false )
+    local _, fheight = love.graphics.itransform( 0.0, font:getHeight(), false )
 
     love.graphics.setColor( fxn.util.unpack(fxn.colors.dgray) )
     for statidx, stat in ipairs( stats ) do
-      love.graphics.print( stat, fbasex, fbasey, 0, fscalex, fscaley )
+      love.graphics.print( stat,
+        fbasex, fbasey + ( 2.0 * fheight ) * (statidx - 1),
+        0, fscalex, fscaley )
     end
   end
 
