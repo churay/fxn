@@ -173,13 +173,12 @@ function board_t.render( self )
       love.graphics.scale( gfxcellw, gfxcellh )
 
       for _, celldir in ipairs( celldirorder ) do
-        local dircolor = util.copy( colors.black )
-        table.insert( dircolor, celldirtypes[celldir] == 0 and 255 or 64 )
+        local diralpha = celldirtypes[celldir] == 0 and 255 or 64
 
-        love.graphics.setColor( util.unpack(dircolor) )
+        love.graphics.setColor( colors.tuple('black', diralpha) )
         love.graphics.polygon( 'fill', 0.0, 0.0, 1.0, 0.0,
           1.0 - gfxedgelen, gfxedgelen, gfxedgelen, gfxedgelen )
-        love.graphics.setColor( util.unpack(colors.red) )
+        love.graphics.setColor( colors.tuple('red') )
         love.graphics.polygon( 'fill', 0.0, 0.0, 1.0, 0.0,
           1.0, gfxgridlen, 0.0, gfxgridlen )
 
@@ -202,7 +201,7 @@ function board_t.rendercell( self, cellx, celly )
   love.graphics.translate( gfxcellx, gfxcelly )
   love.graphics.scale( gfxcellw, gfxcellh )
 
-  love.graphics.setColor( util.unpack(colors.green) )
+  love.graphics.setColor( colors.tuple('green') )
   love.graphics.polygon( 'fill', gfxedgelen, gfxedgelen,
     1.0 - gfxedgelen, gfxedgelen,
     1.0 - gfxedgelen, 1.0 - gfxedgelen,

@@ -39,7 +39,7 @@ function love.run()
     if love.update then love.update( fxn.global.fdt + math.max(-frameleft, 0) ) end
     if love.window and love.graphics and love.window.isCreated() then
       -- TODO(JRC): Change to clear color back to black after testing is complete.
-      love.graphics.clear( unpack(fxn.colors.white) )
+      love.graphics.clear( fxn.colors.tuple('white') )
       love.draw()
       love.graphics.present()
     end
@@ -88,9 +88,7 @@ function love.draw()
   -- (i.e. the arguments they'll take and configuration they'll allow).
   do -- render all entities
     for _, entity in ipairs( entities ) do
-      love.graphics.push()
-      entity:render()
-      love.graphics.pop()
+      love.graphics.push() entity:render() love.graphics.pop()
     end
   end
   --]]
@@ -118,7 +116,7 @@ function love.draw()
     local plscalex = ( 1.0 - ploriginx - plpad ) * 1.0 / ( plsamplemax - plsamplemin )
     local plscaley = ( 1.0 - 2.0*plpad ) * 1.0 / ( plresultmax - plresultmin )
 
-    love.graphics.setColor( unpack(fxn.colors.black) )
+    love.graphics.setColor( fxn.colors.tuple('black') )
     love.graphics.setLineWidth( 0.01 )
 
     love.graphics.translate( 0.0, 0.5 )
@@ -142,7 +140,7 @@ function love.draw()
         local sy = state.func( sx )
         table.insert( samples, sx ); table.insert( samples, sy )
       end
-      love.graphics.setColor( unpack(fxn.colors.dgray) )
+      love.graphics.setColor( fxn.colors.tuple('dgray') )
       love.graphics.line( unpack(samples) )
 
       love.graphics.pop()
@@ -173,7 +171,7 @@ function love.draw()
       love.graphics.scale( plscalex, plscaley )
 
       local plmousex, plmousey = love.graphics.itransform( input:mousexy() )
-      love.graphics.setColor( unpack(fxn.colors.red) )
+      love.graphics.setColor( fxn.colors.tuple('red') )
       love.graphics.line( plmousex, plresultmin, plmousex, plresultmax )
 
       local plmousefuncy = state.func( plmousex )
@@ -203,12 +201,12 @@ function love.draw()
       local statx, staty = statxy( statidx, statw, stath )
       local nstatx, nstaty = statxy( statidx + 1, statw, stath )
 
-      love.graphics.setColor( 177, 177, 177, 180 )
+      love.graphics.setColor( fxn.colors.tuple('lgray', 200) )
       love.graphics.polygon( 'fill',
         statx, staty, statx + statw, staty,
         statx + statw, nstaty, statx, nstaty )
 
-      love.graphics.setColor( 77, 77, 77, 180 )
+      love.graphics.setColor( fxn.colors.tuple('dgray', 200) )
       love.graphics.print( stat, statx, staty, 0, fontsx, fontsy )
     end
   end
