@@ -3,11 +3,12 @@ love.ext = require( 'loveext' )
 
 local state = {
   func = 0,
-  board = 0
+  board = 0,
 }
 
 local input = {
-  mouse = { x=0, y=0 }
+  mouse = { x=0, y=0 },
+  mousexy = function( s ) return s.mouse.x, s.mouse.y end,
 }
 
 local meta = {
@@ -78,7 +79,7 @@ function love.draw()
     love.graphics.scale( 1.0, -1.0 )
   end
 
-  local mousex, mousey = love.graphics.itransform( input.mouse.x, input.mouse.y )
+  local mousex, mousey = love.graphics.itransform( input:mousexy() )
   love.graphics.push() state.board:render() love.graphics.pop()
   love.graphics.push() state.board:rendercell( mousex, mousey ) love.graphics.pop()
 
@@ -171,7 +172,7 @@ function love.draw()
       love.graphics.translate( ploriginx, ploriginy )
       love.graphics.scale( plscalex, plscaley )
 
-      local plmousex, plmousey = love.graphics.itransform( input.mouse.x, input.mouse.y )
+      local plmousex, plmousey = love.graphics.itransform( input:mousexy() )
       love.graphics.setColor( unpack(fxn.colors.red) )
       love.graphics.line( plmousex, plresultmin, plmousex, plresultmax )
 
@@ -192,23 +193,23 @@ function love.draw()
     }
 
     local font = love.graphics.getFont()
-    local fbasex, fbasey = 1e-2, 1.0 - 1e-2
-    local fscalex, fscaley = love.graphics.itransform( 2.0, 2.0, true )
-    local _, fheight = love.graphics.itransform( 0.0, 2.0*font:getHeight(), true )
-    function getstatxy( sidx ) return fbasex, fbasey + fheight * ( sidx - 1 ) end
+    local fontx, fonty, fonts = 1e-2, 1.0 - 1e-2, 2.0
+    local fontsx, fontsy = love.graphics.itransform( fonts, fonts, true )
+    function statxy( si, fw, fh ) return fontx, fonty + fh * ( si - 1 ) end
 
     for statidx, stat in ipairs( stats ) do
-      local statwidth = love.graphics.itransform( 2.0*font:getWidth(stat), 0.0, true )
-      local statx, staty = getstatxy( statidx )
-      local nstatx, nstaty = getstatxy( statidx + 1 )
+      local statw, stath = love.graphics.itransform(
+        fonts * font:getWidth(stat), fonts * font:getHeight(), true )
+      local statx, staty = statxy( statidx, statw, stath )
+      local nstatx, nstaty = statxy( statidx + 1, statw, stath )
 
       love.graphics.setColor( 177, 177, 177, 180 )
       love.graphics.polygon( 'fill',
-        statx, staty, statx + statwidth, staty,
-        statx + statwidth, nstaty, statx, nstaty )
+        statx, staty, statx + statw, staty,
+        statx + statw, nstaty, statx, nstaty )
 
       love.graphics.setColor( 77, 77, 77, 180 )
-      love.graphics.print( stat, statx, staty, 0, fscalex, fscaley )
+      love.graphics.print( stat, statx, staty, 0, fontsx, fontsy )
     end
   end
 

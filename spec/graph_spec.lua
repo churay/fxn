@@ -118,7 +118,7 @@ describe( 'graph_t', function()
     local overwritesrc = overwriteedge:getsrc()
     local overwritedst = overwriteedge:getdst()
 
-    local newelabel = '-' .. overwriteedge:getlabel() .. '-'
+    local newelabel = string.format( '-%s-', tostring(overwriteedge:getlabel()) )
     local newedge = testgraph:addedge( overwritesrc, overwritedst, newelabel )
 
     assert.are.equal( newelabel, newedge:getlabel() )

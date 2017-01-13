@@ -42,24 +42,26 @@ describe( 'love.ext', function()
     it( 'always calls original library functions on calls to overrides', function()
       for _, lgoverfxn in ipairs( LG_OVERFXNS ) do
         love.graphics[lgoverfxn]()
-        assert.stub(lovestub.graphics[lgoverfxn]).was_called( 1 )
+        assert.stub( lovestub.graphics[lgoverfxn] ).was_called( 1 )
       end
     end )
 
-    it( 'calls original library functions with proper parameters on override calls', function()
+    it( 'calls original library functions with proper parameters on ' ..
+        'override calls', function()
       local testparams = { 10, 20 }
       for _, lgoverfxn in ipairs( LG_OVERFXNS ) do
         love.graphics[lgoverfxn]()
-        assert.stub(lovestub.graphics[lgoverfxn]).was_called_with()
+        assert.stub( lovestub.graphics[lgoverfxn] ).was_called_with()
 
         love.graphics[lgoverfxn]( util.unpack(testparams) )
-        assert.stub(lovestub.graphics[lgoverfxn]).was_called_with( util.unpack(testparams) )
+        assert.stub( lovestub.graphics[lgoverfxn] ).was_called_with(
+          util.unpack(testparams) )
       end
     end )
 
     describe( 'transform tracking', function()
-      it( 'returns an identity matrix from "love.graphics.getTransform" when no' ..
-          'other "love.graphics" functions are called beforehand', function()
+      it( 'returns an identity matrix from "love.graphics.getTransform" when ' ..
+          'no other "love.graphics" functions are called beforehand', function()
         assert.are.equallists(
           {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0},
           love.graphics.getTransform(),
@@ -68,7 +70,7 @@ describe( 'love.ext', function()
       end )
 
       it( 'returns an independent transform from "love.graphics.getTransform" ' ..
-          'that cannot be manipulated to manipulate internal tracking values', function()
+          'that cannot be changed to alter internal tracking values', function()
         local lgxform = love.graphics.getTransform()
         for eidx in ipairs( lgxform ) do lgxform[eidx] = 0.0 end
 
@@ -79,7 +81,8 @@ describe( 'love.ext', function()
         )
       end )
 
-      it( 'properly adjusts the transform when "love.graphics.rotate" is invoked', function()
+      it( 'properly adjusts the transform when "love.graphics.rotate" ' ..
+          'is invoked', function()
         love.graphics.rotate( math.pi / 2.0 )
         assert.are.equallists(
           {0.0, -1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0},
@@ -95,7 +98,8 @@ describe( 'love.ext', function()
         )
       end )
 
-      it( 'properly adjusts the transform when "love.graphics.scale" is invoked', function()
+      it( 'properly adjusts the transform when "love.graphics.scale" ' ..
+          'is invoked', function()
         local scalex, scaley = 10, 20
         love.graphics.scale( scalex, scaley )
 
@@ -106,7 +110,8 @@ describe( 'love.ext', function()
         )
       end )
 
-      it( 'properly adjusts the transform when "love.graphics.shear" is invoked', function()
+      it( 'properly adjusts the transform when "love.graphics.shear" ' ..
+          'is invoked', function()
         local shearx, sheary = 10, 20
         love.graphics.shear( shearx, sheary )
 
@@ -117,7 +122,8 @@ describe( 'love.ext', function()
         )
       end )
 
-      it( 'properly adjusts the transform when "love.graphics.translate" is invoked', function()
+      it( 'properly adjusts the transform when "love.graphics.translate" ' ..
+          'is invoked', function()
         local transx, transy = 10, 20
         love.graphics.translate( transx, transy )
 
@@ -128,7 +134,8 @@ describe( 'love.ext', function()
         )
       end )
 
-      it( 'properly applies the transform to the position given to "love.graphics.transform"', function()
+      it( 'properly applies the transform to the position given to ' ..
+          '"love.graphics.transform"', function()
         local posx, posy = 14, 28
         local transx, transy = 10, 20
 
@@ -141,13 +148,13 @@ describe( 'love.ext', function()
         )
       end )
 
-      it( 'properly applies the inverse transform to the position given to ' ..
-          '"love.graphics.transform" when the inverse flag is set to true', function()
+      it( 'properly applies the inverse transform to the position given ' ..
+          'to "love.graphics.itransform"', function()
         local posx, posy = 14, 28
         local transx, transy = 10, 20
 
         love.graphics.translate( transx, transy )
-        local xformx, xformy = love.graphics.transform( posx, posy, true )
+        local xformx, xformy = love.graphics.itransform( posx, posy )
         assert.are.equallists(
           {posx - transx, posy - transy},
           {xformx, xformy},
@@ -171,8 +178,9 @@ describe( 'love.ext', function()
         )
       end )
 
-      it( 'adjusts the transform following standard stack save/restore behavior when ' ..
-          '"love.graphics.pop" and "love.graphics.push" are called', function()
+      it( 'adjusts the transform following standard stack save/restore ' ..
+          'behavior when "love.graphics.pop" and "love.graphics.push" ' ..
+          'are called', function()
         for transamt = 1, 10, 1 do
           love.graphics.translate( 1 )
           love.graphics.push()

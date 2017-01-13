@@ -18,21 +18,19 @@ local graph_t = struct( {},
 
 function graph_t.__tostring( self )
   local graphstr = {}
-  table.insert( graphstr, table.concat({'Graph {',
-    self._nlabelsunique and 'U' or 'D', '|',
-    self._elabelsunique and 'U' or 'D', '} [',
-    tostring(#self:querynodes()), '|',
-    tostring(#self:queryedges()), ']:' }, '') )
+  table.insert( graphstr, string.format('Graph {%s|%s} [%d|%d]',
+    self._nlabelsunique and 'U' or 'D',
+    self._elabelsunique and 'U' or 'D',
+    self:querynodes(), self:queryedges()) )
 
   for _, node in ipairs( self:querynodes() ) do
-    local nodestr, edgestr = { '  ', tostring(node) }, {}
+    local edgestrs = {}
     for _, oedge in ipairs( node:getoutedges() ) do
-      table.insert( edgestr, tostring(oedge) )
+      table.insert( edgestrs, tostring(oedge) )
     end
 
-    table.insert( graphstr, table.concat({'  ',
-      table.concat(nodestr, ''), ' : [ ',
-      table.concat(edgestr, ', '), ' ]'}) )
+    table.insert( graphstr, string.format('  %s : [ %s ]'),
+      tostring(node), table.concat(edgestrs, ', ') )
   end
 
   return table.concat( graphstr, '\n' )
@@ -68,10 +66,11 @@ function graph_t.addedge( self, srcnode, dstnode, elabel, bielabel )
 
     local srcnid, dstnid = srcnode._nid, dstnode._nid
     local elabel = elabel == nil and true or elabel
+    local eid = string.format( '%d-%d', srcnid, dstnid )
     self._edges.labels[srcnid][dstnid] = elabel
     self._edges.outgoing[srcnid][dstnid] = true
     self._edges.incoming[dstnid][srcnid] = true
-    table.insert( self._elabels[elabel], srcnid .. '-' .. dstnid )
+    table.insert( self._elabels[elabel], eid )
 
     return graph_t.edge_t( self, srcnid, dstnid )
   end
@@ -99,7 +98,8 @@ end
 function graph_t.removeedge( self, ... )
   local edge = self:findedge( ... )
   if edge then
-    util.lsub( self._elabels[edge:getlabel()], edge._srcnid .. '-' .. edge._dstnid )
+    local eid = string.format( '%d-%d', edge._srcnid, edge._dstnid )
+    util.lsub( self._elabels[edge:getlabel()], eid )
     self._edges.labels[edge._srcnid][edge._dstnid] = nil
     self._edges.outgoing[edge._srcnid][edge._dstnid] = nil
     self._edges.incoming[edge._dstnid][edge._srcnid] = nil
@@ -197,11 +197,11 @@ function graph_t.node_t.__eq( self, other )
 end
 
 function graph_t.node_t.__tostring( self )
-  return table.concat( {'"', tostring(self:getlabel()), '"', self:getid()} )
+  return string.format( '"%s"%s', tostring(self:getlabel()), self:getid() )
 end
 
 function graph_t.node_t.getid( self )
-  return table.concat( {'@', tostring(self._nid)} )
+  return string.format( '@%d', self._nid )
 end
 
 function graph_t.node_t.getlabel( self )
@@ -232,11 +232,11 @@ function graph_t.edge_t.__eq( self, other )
 end
 
 function graph_t.edge_t.__tostring( self )
-  return table.concat( {'"', tostring(self:getlabel()), '"', self:getid()} )
+  return string.format( '"%s"%s', tostring(self:getlabel()), self:getid() )
 end
 
 function graph_t.edge_t.getid( self )
-  return table.concat( {'@', tostring(self._srcnid), '-', tostring(self._dstnid)} )
+  return string.format( '@%d-%d', self._srcnid, self._dstnid )
 end
 
 function graph_t.edge_t.getlabel( self )
