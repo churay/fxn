@@ -17,6 +17,18 @@ function bbox_t._init( self, ... )
   end
 end
 
+--[[ Operators ]]--
+
+-- TODO(JRC): Implement this function.
+function bbox_t.__eq( self, bbox )
+  return false
+end
+
+-- TODO(JRC): Implement this function.
+function bbox_t.__tostring( self )
+  return ""
+end
+
 --[[ Public Functions ]]--
 
 -- TODO(JRC): Determine a good interface for a set of function that

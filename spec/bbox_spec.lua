@@ -11,11 +11,13 @@ describe( 'bbox_t', function()
   --[[ Testing Variables ]]--
 
   local testbbox = nil
+  local unitbbox = nil
 
   --[[ Set Up / Tear Down Functions ]]--
 
   before_each( function()
     testbbox = bbox_t( TEST_BBOX_POS, TEST_BBOX_DIM )
+    unitbbox = bbox_t( 0, 0, 1, 1 )
   end )
 
   --[[ Testing Functions ]]--
@@ -41,6 +43,41 @@ describe( 'bbox_t', function()
         TEST_BBOX_DIM.x, TEST_BBOX_DIM.y )
       assert.are.same( TEST_BBOX_POS, fullbox.pos )
       assert.are.same( TEST_BBOX_DIM, fullbox.dim )
+    end )
+  end )
+
+  describe( 'intersect', function()
+    it( 'returns nil for a given disjoint box', function()
+      local emptybbox = bbox_t()
+      assert.falsy( testbbox:intersect(emptybbox) )
+      assert.falsy( emptybbox:intersect(testbbox) )
+
+      local disjointbbox = bbox_t( 10, 20, 30, 40 )
+      assert.falsy( testbbox:intersect(disjointbbox) )
+      assert.falsy( disjointbbox:intersect(testbbox) )
+    end )
+
+    it( 'returns the intersection volume for a given embedded box', function()
+      local halfbbox = bbox_t( 0.25, 0.25, 0.75, 0.75 )
+
+      for oidx = 1, 2 do
+        local resultbbox = oidx == 1 and unitbbox:intersect( halfbbox ) or
+          halfbbox:intersect( unitbbox )
+        assert.are.same( halfbbox.pos, resultbbox.pos )
+        assert.are.same( halfbbox.dim, resultbbox.dim )
+      end
+    end )
+
+    it( 'returns the intersection volume for a given overlapping box', function()
+      local otherbbox = bbox_t( 0.8, 0.9, 1.5, 1.2 )
+      local expectedbbox = bbox_t( 0.8, 0.9, 0.2, 0.1 )
+
+      for oidx = 1, 2 do
+        local resultbbox = oidx == 1 and unitbbox:intersect( otherbbox ) or
+          otherbbox:intersect( unitbbox )
+        assert.are.same( expectedbbox.pos, resultbbox.pos )
+        assert.are.same( expectedbbox.dim, resultbbox.dim )
+      end
     end )
   end )
 
