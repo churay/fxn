@@ -30,8 +30,30 @@ function bbox_t.contains( self, point )
   return nil
 end
 
-function bbox_t.overlay( self, bbox )
-  return nil
+function bbox_t.intersect( self, bbox )
+  local function rangeintersect( lo1, hi1, lo2, hi2 )
+    local vals = { {lo1, 1}, {hi1, 1}, {lo2, 2}, {hi2, 2} }
+    table.sort( vals, function(v1, v2) return v1[1] < v2[1] end )
+    if vals[1][2] ~= vals[2][2] then return vals[2][1], vals[3][1] end
+  end
+
+  local selfmin, selfmax = self:min(), self:max()
+  local bboxmin, bboxmax = bbox:min(), bbox:max()
+
+  local xlo, xhi = rangeintersect( selfmin.x, selfmax.x, bboxmin.x, bboxmax.x )
+  local ylo, yhi = rangeintersect( selfmin.y, selfmax.y, bboxmin.y, bboxmax.y )
+
+  if xlo ~= nil and xhi ~= nil and ylo ~= nil and yhi ~= nil then
+    return bbox_t( xlo, ylo, xhi - xlo, yhi - ylo )
+  end
+end
+
+function bbox_t.min( self )
+  return vector_t( self.pos.x, self.pos.y )
+end
+
+function bbox_t.max( self )
+  return vector_t( self.pos.x + self.dim.x, self.pos.y + self.dim.y )
 end
 
 return bbox_t
