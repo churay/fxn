@@ -20,7 +20,7 @@ end
 
 function vector_ipfxns.__mul( lvalue, rvalue )
   local self, scalar = nil, nil
-  if type( lvalue ) == "number" then self, scalar = rvalue, lvalue
+  if type( lvalue ) == 'number' then self, scalar = rvalue, lvalue
   else self, scalar = lvalue, rvalue end
 
   self.x = scalar * self.x
@@ -33,11 +33,11 @@ function vector_ipfxns.__unm( self )
 end
 
 function vector_t.__eq( self, vector )
-  return self.x == vector.x and self.y == vector.y
+  return util.fequal( self.x, vector.x ) and util.fequal( self.y, vector.y )
 end
 
 function vector_t.__tostring( self )
-  return "<" .. self.x .. ", " .. self.y .. ">"
+  return string.format( '<%.6f, %.6f>', self.x, self.y )
 end
 
 --[[ Public Functions ]]--
