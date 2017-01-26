@@ -1,6 +1,6 @@
 ### Compilation/Linking Tools and Flags ###
 
-LUA_PPATH = $(LUA_PATH);$(LUA_DIR)/?.lua;$(OPT_DIR)/?.lua
+LUA_PPATH = $(LUA_PATH);$(LUA_DIR)/init.lua;$(OPT_DIR)/?.lua
 LUA_TPATH = $(LUA_PPATH);$(TEST_DIR)/?.lua
 
 LUA_RUNNER = env LUA_PATH='$(LUA_PPATH)' love

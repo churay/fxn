@@ -1,7 +1,7 @@
-local struct = require( 'struct' )
-local graph_t = require( 'graph_t' )
-local colors = require( 'colors' )
-local util = require( 'util' )
+local struct = require( 'fxn.struct' )
+local graph_t = require( 'fxn.graph_t' )
+local colors = require( 'fxn.colors' )
+local util = require( 'fxn.util' )
 
 -- TODO(JRC): This code could be extended in to make more general types of
 -- boards possible by abstracting out the concepts of tiles and directions.

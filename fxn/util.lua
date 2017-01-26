@@ -18,14 +18,21 @@ end
 
 --[[ System Functions ]]--
 
-function util.libload( libbase )
+function util.libload( libbase, debug )
+  local debug = debug or false
   local lib = {}
 
   local plibpaths = io.popen( 'ls -1a ' .. libbase )
   for libpath in plibpaths:lines() do
     if string.match( libpath, '^.*%.lua$' ) and libpath ~= 'init.lua' then
-      local libmodule = string.sub( libpath, 1, string.find(libpath, '%.lua$')-1 )
-      lib[libmodule] = require( libmodule )
+      local libmodname = string.sub( libpath, 1, string.find(libpath, '%.lua$')-1 )
+      local libmodpath = string.format( '%s.%s', libbase, libmodname )
+      if debug then
+        local loadsuccess, loadresult = pcall( require, libmodpath )
+        if not loadsuccess then print( loadresult ) return nil end
+      else
+        lib[libmodname] = require( libmodpath )
+      end
     end
   end
   plibpaths:close()

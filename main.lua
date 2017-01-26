@@ -1,5 +1,5 @@
 local fxn = require( 'fxn' )
-love.ext = require( 'loveext' )
+love.ext = require( 'opt.loveext' )
 
 local state = {
   func = 0,

@@ -1,5 +1,5 @@
-local struct = require( 'struct' )
-local util = require( 'util' )
+local struct = require( 'fxn.struct' )
+local util = require( 'fxn.util' )
 
 --[[ Constructor ]]--
 

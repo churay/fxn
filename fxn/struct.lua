@@ -1,4 +1,4 @@
-local util = require( 'util' )
+local util = require( 'fxn.util' )
 
 -- Struct Rules:
 -- Distribute copies of all default fields (per-instance fields).

@@ -1,6 +1,6 @@
-local util = require( 'util' )
-local struct = require( 'struct' )
-local vector_t = require( 'vector_t' )
+local util = require( 'fxn.util' )
+local struct = require( 'fxn.struct' )
+local vector_t = require( 'fxn.vector_t' )
 
 --[[ Constructor ]]--
 

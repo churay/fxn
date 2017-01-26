@@ -1,5 +1,5 @@
-local assert = require( "luassert" )
-local say = require( "say" )
+local assert = require( 'luassert' )
+local say = require( 'say' )
 
 local function equaly( state, arguments )
   local expectednumber, actualnumber = arguments[1], arguments[2]
@@ -75,41 +75,41 @@ local function equaltables( state, arguments )
   end
 end
 
-say:set_namespace( "en" )
+say:set_namespace( 'en' )
 
-say:set( "assertion.are.equaly",
-  "Expected numbers to be nearly equal.\n" ..
-  "Expected:\n%s\nPassed In:\n%s\nEpsilon:\n%s" )
-say:set( "assertion.are_not.equaly",
-  "Expected numbers to be sufficiently different.\n" ..
-  "Expected:\n%s\nPassed In:\n%s\nEpsilon:\n%s" )
+say:set( 'assertion.are.equaly',
+  'Expected numbers to be nearly equal.\n' ..
+  'Expected:\n%s\nPassed In:\n%s\nEpsilon:\n%s' )
+say:set( 'assertion.are_not.equaly',
+  'Expected numbers to be sufficiently different.\n' ..
+  'Expected:\n%s\nPassed In:\n%s\nEpsilon:\n%s' )
 
-say:set( "assertion.are.equalsets",
-  "Expected lists to be contain the same elements in any order.\n" ..
-  "Expected:\n%s\nPassed In:\n%s" )
-say:set( "assertion.are_not.equalsets",
-  "Expected lists to contain at least one differing element.\n" ..
-  "Expected:\n%s\nPassed In:\n%s" )
+say:set( 'assertion.are.equalsets',
+  'Expected lists to be contain the same elements in any order.\n' ..
+  'Expected:\n%s\nPassed In:\n%s' )
+say:set( 'assertion.are_not.equalsets',
+  'Expected lists to contain at least one differing element.\n' ..
+  'Expected:\n%s\nPassed In:\n%s' )
 
-say:set( "assertion.are.equallists",
-  "Expected lists to be contain the same elements in the same order.\n" ..
-  "Expected:\n%s\nPassed In:\n%s" )
-say:set( "assertion.are_not.equallists",
-  "Expected lists to contain at least one differing element.\n" ..
-  "Expected:\n%s\nPassed In:\n%s" )
+say:set( 'assertion.are.equallists',
+  'Expected lists to be contain the same elements in the same order.\n' ..
+  'Expected:\n%s\nPassed In:\n%s' )
+say:set( 'assertion.are_not.equallists',
+  'Expected lists to contain at least one differing element.\n' ..
+  'Expected:\n%s\nPassed In:\n%s' )
 
-say:set( "assertion.are.equaltables",
-  "Expected tables to be contain the same key/value pairs.\n" ..
-  "Expected:\n%s\nPassed In:\n%s" )
-say:set( "assertion.are_not.equaltables",
-  "Expected tables to contain at least one key/value pair.\n" ..
-  "Expected:\n%s\nPassed In:\n%s" )
+say:set( 'assertion.are.equaltables',
+  'Expected tables to be contain the same key/value pairs.\n' ..
+  'Expected:\n%s\nPassed In:\n%s' )
+say:set( 'assertion.are_not.equaltables',
+  'Expected tables to contain at least one key/value pair.\n' ..
+  'Expected:\n%s\nPassed In:\n%s' )
 
-assert:register( "assertion", "equaly", equaly,
-  "assertion.are.equaly", "assertion.are_not.equaly" )
-assert:register( "assertion", "equalsets", equalsets,
-  "assertion.are.equalsets", "assertion.are_not.equalsets" )
-assert:register( "assertion", "equallists", equallists,
-  "assertion.are.equallists", "assertion.are_not.equallists" )
-assert:register( "assertion", "equaltables", equaltables,
-  "assertion.are.equaltables", "assertion.are_not.equaltables" )
+assert:register( 'assertion', 'equaly', equaly,
+  'assertion.are.equaly', 'assertion.are_not.equaly' )
+assert:register( 'assertion', 'equalsets', equalsets,
+  'assertion.are.equalsets', 'assertion.are_not.equalsets' )
+assert:register( 'assertion', 'equallists', equallists,
+  'assertion.are.equallists', 'assertion.are_not.equallists' )
+assert:register( 'assertion', 'equaltables', equaltables,
+  'assertion.are.equaltables', 'assertion.are_not.equaltables' )

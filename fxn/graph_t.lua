@@ -1,6 +1,6 @@
-local struct = require( 'struct' )
-local table_t = require( 'table_t' )
-local util = require( 'util' )
+local table_t = require( 'fxn.table_t' )
+local struct = require( 'fxn.struct' )
+local util = require( 'fxn.util' )
 
 --[[ Constructor ]]--
 
