@@ -7,6 +7,7 @@ describe( 'bbox_t', function()
 
   local TEST_BBOX_MIN = vector_t( 1, 2 )
   local TEST_BBOX_DIM = vector_t( 3, 4 )
+  local TEST_BBOX_CENTER = vector_t( 2.5, 4 )
 
   --[[ Testing Variables ]]--
 
@@ -44,6 +45,44 @@ describe( 'bbox_t', function()
         TEST_BBOX_DIM.x, TEST_BBOX_DIM.y )
       assert.are.equal( TEST_BBOX_MIN, fullbox.min )
       assert.are.equal( TEST_BBOX_DIM, fullbox.dim )
+    end )
+  end )
+
+  describe( 'contains', function()
+    local testmovevecs = nil
+
+    before_each( function()
+      testmovevecs = {}
+
+      for movedim = 1, 2 do
+        for movedir = -1, 1, 2 do
+          local moved = movedim == 1 and 'x' or 'y'
+          local movevec = 0.5 * movedir * testbbox.dim[moved] *
+            vector_t( movedim == 1 and 1 or 0, movedim == 2 and 1 or 0 )
+          table.insert( testmovevecs, movevec )
+        end
+      end
+    end )
+
+    it( 'returns false for given points outside the bounding box', function()
+      for _, testmovevec in ipairs( testmovevecs ) do
+        local testpoint = TEST_BBOX_CENTER + 1.1 * testmovevec
+        assert.is_false( testbbox:contains(testpoint) )
+      end
+    end )
+
+    it( 'returns true for given points inside the bounding box', function()
+      for _, testmovevec in ipairs( testmovevecs ) do
+        local testpoint = TEST_BBOX_CENTER + 0.9 * testmovevec
+        assert.is_true( testbbox:contains(testpoint) )
+      end
+    end )
+
+    it( 'returns true for given points on the bounding box boundary', function()
+      for _, testmovevec in ipairs( testmovevecs ) do
+        local testpoint = TEST_BBOX_CENTER + 1.0 * testmovevec
+        assert.is_true( testbbox:contains(testpoint) )
+      end
     end )
   end )
 
