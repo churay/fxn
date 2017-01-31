@@ -22,7 +22,7 @@ end
 --[[ Operators ]]--
 
 function bbox_t.__eq( self, bbox )
-  return self.min == bbox.min and self.dim == bbox.dim
+  return self.min == bbox.min and self.max == bbox.max and self.dim == bbox.dim
 end
 
 function bbox_t.__tostring( self )
@@ -31,11 +31,18 @@ end
 
 --[[ Public Functions ]]--
 
--- TODO(JRC): Determine a good interface for a set of function that
--- will allow for transforming the bounding box with standard linear
--- transformations (e.g. translation, scale, etc.).
-function bbox_t.transform( self, ... )
-  return nil
+function bbox_t.translate( self, ... )
+  local args = { ... }
+  local tvec = #args == 2 and vector_t( ... ) or args[1]
+  self.min:addip( tvec )
+  self.max:addip( tvec )
+end
+
+function bbox_t.scale( self, ... )
+  local args = { ... }
+  local svec = #args == 2 and vector_t( ... ) or args[1]
+  self.dim.x, self.dim.y = svec.x * self.dim.x, svec.y * self.dim.y
+  self.max.x, self.max.y = self.min.x + self.dim.x, self.min.y + self.dim.y
 end
 
 function bbox_t.contains( self, point )

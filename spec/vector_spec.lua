@@ -39,7 +39,7 @@ describe( 'vector_t', function()
       assert.are.equal( samevector, testvector )
     end )
 
-    it( 'properly returns true for vectors with differences', function()
+    it( 'properly returns false for vectors with differences', function()
       local diffvector = vector_t( TEST_VECTOR_X + 1, TEST_VECTOR_Y )
 
       assert.are_not.equal( testvector, zerovector )

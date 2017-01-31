@@ -1,6 +1,7 @@
 require( 'bustedext' )
-local vector_t = require( 'fxn.vector_t' )
 local bbox_t = require( 'fxn.bbox_t' )
+local vector_t = require( 'fxn.vector_t' )
+local util = require( 'fxn.util' )
 
 describe( 'bbox_t', function()
   --[[ Testing Constants ]]--
@@ -28,6 +29,7 @@ describe( 'bbox_t', function()
       local emptybox = bbox_t()
       local emptyvec = vector_t()
       assert.are.equal( vector_t(), emptybox.min )
+      assert.are.equal( vector_t(), emptybox.max )
       assert.are.equal( vector_t(), emptybox.dim )
     end )
 
@@ -35,6 +37,7 @@ describe( 'bbox_t', function()
         'two parameters are given', function()
       local vectorbox = bbox_t( TEST_BBOX_MIN, TEST_BBOX_DIM )
       assert.are.equal( TEST_BBOX_MIN, vectorbox.min )
+      assert.are.equal( TEST_BBOX_MIN + TEST_BBOX_DIM, vectorbox.max )
       assert.are.equal( TEST_BBOX_DIM, vectorbox.dim )
     end )
 
@@ -44,7 +47,70 @@ describe( 'bbox_t', function()
         TEST_BBOX_MIN.x, TEST_BBOX_MIN.y,
         TEST_BBOX_DIM.x, TEST_BBOX_DIM.y )
       assert.are.equal( TEST_BBOX_MIN, fullbox.min )
+      assert.are.equal( TEST_BBOX_MIN + TEST_BBOX_DIM, fullbox.max )
       assert.are.equal( TEST_BBOX_DIM, fullbox.dim )
+    end )
+  end )
+
+  describe( 'eq', function()
+    it( 'properly returns true for identical bounding boxes', function()
+      local samebbox = bbox_t( TEST_BBOX_MIN, TEST_BBOX_DIM )
+
+      assert.are.equal( testbbox, testbbox )
+      assert.are.equal( samebbox, samebbox )
+
+      assert.are.equal( testbbox, samebbox )
+      assert.are.equal( samebbox, testbbox )
+    end )
+
+    it( 'properly returns false for bounding boxes with differences', function()
+      local diffbbox = bbox_t( TEST_BBOX_MIN + TEST_BBOX_MIN, TEST_BBOX_DIM )
+
+      assert.are_not.equal( textbbox, unitbbox )
+      assert.are_not.equal( unitbbox, testbbox )
+
+      assert.are_not.equal( textbbox, diffbbox )
+      assert.are_not.equal( diffbbox, testbbox )
+    end )
+  end )
+
+  describe( 'translate', function()
+    it( 'properly transforms the coordinates of the box when provided with ' ..
+        'a vector argument', function()
+      testbbox:translate( vector_t() )
+      assert.are.equal( bbox_t(TEST_BBOX_MIN, TEST_BBOX_DIM), testbbox )
+
+      testbbox:translate( TEST_BBOX_MIN )
+      assert.are.equal( bbox_t(2*TEST_BBOX_MIN, TEST_BBOX_DIM), testbbox )
+    end )
+
+    it( 'properly transforms the coordinates of the box when provided with ' ..
+        'two coordinate arguments', function()
+      testbbox:translate( vector_t():xy() )
+      assert.are.equal( bbox_t(TEST_BBOX_MIN, TEST_BBOX_DIM), testbbox )
+
+      testbbox:translate( TEST_BBOX_MIN:xy() )
+      assert.are.equal( bbox_t(2*TEST_BBOX_MIN, TEST_BBOX_DIM), testbbox )
+    end )
+  end )
+
+  describe( 'scale', function()
+    it( 'properly scales the dimensions of the box when provided with ' ..
+        'a vector argument', function()
+      testbbox:scale( vector_t(1, 1) )
+      assert.are.equal( bbox_t(TEST_BBOX_MIN, TEST_BBOX_DIM), testbbox )
+
+      testbbox:scale( vector_t(2, 2) )
+      assert.are.equal( bbox_t(TEST_BBOX_MIN, 2*TEST_BBOX_DIM), testbbox )
+    end )
+
+    it( 'properly scales the dimensions of the box when provided with ' ..
+        'two coordinate arguments', function()
+      testbbox:scale( 1, 1 )
+      assert.are.equal( bbox_t(TEST_BBOX_MIN, TEST_BBOX_DIM), testbbox )
+
+      testbbox:scale( 2, 2 )
+      assert.are.equal( bbox_t(TEST_BBOX_MIN, 2*TEST_BBOX_DIM), testbbox )
     end )
   end )
 
