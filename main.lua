@@ -56,7 +56,7 @@ end
 function love.load()
   state.func = fxn.func_t( function(x) return math.sin(x) end )
   state.board = fxn.board_t( 10, 10 )
-  state.renderable = fxn.renderable_t( {}, 1.0 )
+  state.renderable = fxn.renderable_t()
 end
 
 function love.keypressed( key, scancode, isrepeat )

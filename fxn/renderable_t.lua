@@ -4,7 +4,7 @@ local colors = require( 'fxn.colors' )
 
 --[[ Constructor ]]--
 
-local renderable_t = struct( {}, '_subrenders', {}, '_targetratio', nil )
+local renderable_t = struct( {}, '_subrenders', {}, '_targetratio', false )
 
 --[[ Public Functions ]]--
 
@@ -13,9 +13,10 @@ function renderable_t.render( self, renderbox, strict, _contextratio )
   local _contextratio = _contextratio or
     love.graphics.getWidth() / love.graphics.getHeight()
 
-  if not strict and self._targetratio ~= nil then
-    renderbox = bbox_t( renderbox.min.x, renderbox.min.y, renderbox.dim.x,
-      (renderbox.dim.x / self._targetratio) * renderbox.dim.y )
+  if not strict and self._targetratio then
+    renderbox = bbox_t( renderbox.min.x, renderbox.min.y,
+      self._targetratio * renderbox.dim.y / _contextratio, renderbox.dim.y )
+    _contextratio = _targetratio
   end
 
   love.graphics.push()
@@ -25,7 +26,7 @@ function renderable_t.render( self, renderbox, strict, _contextratio )
   self:_render()
   for _, subrenders in ipairs( self._subrenders ) do
     local subrenderable, subbbox, substrict = unpack( subrender )
-    subrenderable:render( subbbox, substrict, _contextratio * renderbox:ratio() )
+    subrenderable:render( subbbox, substrict, _contextratio )
   end
 
   love.graphics.pop()
