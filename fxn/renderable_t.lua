@@ -1,4 +1,5 @@
 local bbox_t = require( 'fxn.bbox_t' )
+local vector_t = require( 'fxn.vector_t' )
 local struct = require( 'fxn.struct' )
 local colors = require( 'fxn.colors' )
 
@@ -8,28 +9,50 @@ local renderable_t = struct( {}, '_subrenders', {}, '_targetratio', false )
 
 --[[ Public Functions ]]--
 
-function renderable_t.render( self, renderbox, strict, _contextratio )
+function renderable_t.render( self, bbox, strict, _contextratio )
   local strict = strict or false
   local _contextratio = _contextratio or
     love.graphics.getWidth() / love.graphics.getHeight()
 
+  local roffset, rdims = vector_t(), vector_t( bbox.dim:xy() )
   if not strict and self._targetratio then
-    renderbox = bbox_t( renderbox.min.x, renderbox.min.y,
-      self._targetratio * renderbox.dim.y / _contextratio, renderbox.dim.y )
-    _contextratio = _targetratio
+    local wscaled = self._targetratio * bbox.dim.y / _contextratio
+    local hscaled = _contextratio * bbox.dim.x / self._targetratio
+
+    if wscaled < bbox.dim.x then
+      roffset.x, rdims.x = ( bbox.dim.x - wscaled ) / 2.0, wscaled
+    else
+      roffset.y, rdims.y = ( bbox.dim.y - hscaled ) / 2.0, hscaled
+    end
   end
 
-  love.graphics.push()
-  love.graphics.translate( renderbox.min:xy() )
-  love.graphics.scale( renderbox.dim:xy() )
+  local rbox = bbox_t( bbox.min + roffset, rdims )
+  _contextratio = _contextratio * rbox:ratio()
 
-  self:_render()
-  for _, subrenders in ipairs( self._subrenders ) do
-    local subrenderable, subbbox, substrict = unpack( subrender )
-    subrenderable:render( subbbox, substrict, _contextratio )
+  do -- render bounding box for debugging
+    love.graphics.push()
+    love.graphics.translate( bbox.min:xy() )
+    love.graphics.scale( bbox.dim:xy() )
+
+    love.graphics.setLineWidth( 0.01 )
+    love.graphics.setColor( colors.tuple('yellow') )
+    love.graphics.polygon( 'line', 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0 )
+    love.graphics.pop()
   end
 
-  love.graphics.pop()
+  do -- render actual object contents
+    love.graphics.push()
+    love.graphics.translate( rbox.min:xy() )
+    love.graphics.scale( rbox.dim:xy() )
+
+    self:_render()
+    for _, subrenders in ipairs( self._subrenders ) do
+      local subrenderable, subbbox, substrict = unpack( subrender )
+      subrenderable:render( subbbox, substrict, _contextratio )
+    end
+
+    love.graphics.pop()
+  end
 end
 
 --[[ Private Functions ]]--

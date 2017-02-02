@@ -65,7 +65,7 @@ function bbox_t.intersect( self, bbox )
   end
 end
 
-function bbox_t.ratio()
+function bbox_t.ratio( self )
   return self.dim.x / self.dim.y
 end
 
