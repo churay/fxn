@@ -1,26 +1,6 @@
 local fxn = require( 'fxn' )
 love.ext = require( 'opt.loveext' )
 
-local state = {
-  func = 0,
-  board = 0,
-}
-
-local graphics = {
-  windowbbox = fxn.bbox_t( 0.0, 0.0, 1.0, 1.0 ),
-}
-
-local input = {
-  mouse = { x=0, y=0 },
-  mousexy = function( s ) return s.mouse.x, s.mouse.y end,
-}
-
-local meta = {
-  framenum = 1,
-  avgfps = 0,
-  showstats = true,
-}
-
 function love.run()
   math.randomseed( os.time() )
 
@@ -58,20 +38,24 @@ function love.run()
 end
 
 function love.load()
-  state.func = fxn.func_t( function(x) return math.sin(x) end )
-  state.board = fxn.board_t( 10, 10 )
+  fxn.model.func = fxn.func_t( function(x) return math.sin(x) end )
+  fxn.model.board = fxn.board_t( 10, 10 )
+
+  fxn.view.viewport = fxn.bbox_t( 0.0, 0.0, 1.0, 1.0 )
+
+  fxn.input.mouse = fxn.vector_t( 0.0, 0.0 )
 end
 
 function love.keypressed( key, scancode, isrepeat )
-  if key == 'd' then meta.showstats = not meta.showstats end
+  if key == 'd' then fxn.global.debug = not fxn.global.debug end
   if key == 'q' then love.event.quit() end
 end
 
 function love.update( dt )
-  input.mouse.x, input.mouse.y = love.mouse.getPosition()
+  fxn.input.mouse.x, fxn.input.mouse.y = love.mouse.getPosition()
 
-  meta.framenum = meta.framenum + 1
-  meta.avgfps = 1 / dt
+  fxn.global.fnum = fxn.global.fnum + 1
+  fxn.global.avgfps = 1 / dt
 end
 
 function love.draw()
@@ -85,7 +69,7 @@ function love.draw()
 
   -- TODO(JRC): Figure out how graphics that depend on user input can be
   -- rendered easily (e.g. the currently user-selected tile).
-  state.board:render( graphics.windowbbox )
+  fxn.model.board:render( fxn.view.viewport )
 
   --[[
   -- TODO(JRC): Figure out how each individual entity will be rendered
@@ -141,7 +125,7 @@ function love.draw()
       for sidx = 1, plsamplenum do
         local sratio = ( sidx - 1 ) / ( plsamplenum - 1 )
         local sx = plsamplemin + ( plsamplemax - plsamplemin ) * sratio
-        local sy = state.func( sx )
+        local sy = fxn.model.func( sx )
         table.insert( samples, sx ); table.insert( samples, sy )
       end
       love.graphics.setColor( fxn.colors.tuple('dgray') )
@@ -162,7 +146,7 @@ function love.draw()
         local smidx = plsamplemin + ( plsamplemax - plsamplemin ) * smidrx
 
         local szeroy = ( plresultmax + plresultmin ) / 2.0
-        local smidy = state.func( smidx )
+        local smidy = fxn.model.func( smidx )
 
         love.graphics.polygon( 'line', sminx, szeroy, smaxx, szeroy,
           smaxx, smidy, sminx, smidy )
@@ -174,11 +158,11 @@ function love.draw()
       love.graphics.translate( ploriginx, ploriginy )
       love.graphics.scale( plscalex, plscaley )
 
-      local plmousex, plmousey = love.graphics.itransform( input:mousexy() )
+      local plmousex, plmousey = love.graphics.itransform( fxn.input.mouse:xy() )
       love.graphics.setColor( fxn.colors.tuple('red') )
       love.graphics.line( plmousex, plresultmin, plmousex, plresultmax )
 
-      local plmousefuncy = state.func( plmousex )
+      local plmousefuncy = fxn.model.func( plmousex )
       plmousex, plmousefuncy = love.graphics.transform( plmousex, plmousefuncy )
       love.graphics.pop()
       plmousex, plmousefuncy = love.graphics.itransform( plmousex, plmousefuncy )
@@ -188,10 +172,10 @@ function love.draw()
   end
   --]]
 
-  if meta.showstats then -- display the game statistics hud
+  if fxn.global.debug then -- display the game statistics hud
     local stats = {
-      string.format( 'Frame #: %d', meta.framenum ),
-      string.format( 'FPS: %.2f', meta.avgfps ),
+      string.format( 'Frame #: %d', fxn.global.fnum ),
+      string.format( 'FPS: %.2f', fxn.global.avgfps ),
     }
 
     local font = love.graphics.getFont()
