@@ -6,6 +6,10 @@ local state = {
   board = 0,
 }
 
+local graphics = {
+  windowbbox = fxn.bbox_t( 0.0, 0.0, 1.0, 1.0 ),
+}
+
 local input = {
   mouse = { x=0, y=0 },
   mousexy = function( s ) return s.mouse.x, s.mouse.y end,
@@ -56,7 +60,6 @@ end
 function love.load()
   state.func = fxn.func_t( function(x) return math.sin(x) end )
   state.board = fxn.board_t( 10, 10 )
-  state.renderable = fxn.renderable_t( {}, 1 )
 end
 
 function love.keypressed( key, scancode, isrepeat )
@@ -80,13 +83,9 @@ function love.draw()
     love.graphics.scale( 1.0, -1.0 )
   end
 
-  --[[
-  local mousex, mousey = love.graphics.itransform( input:mousexy() )
-  love.graphics.push() state.board:render() love.graphics.pop()
-  love.graphics.push() state.board:rendercell( mousex, mousey ) love.graphics.pop()
-  ]]--
-
-  state.renderable:render( fxn.bbox_t(0.25, 0.25, 0.5, 0.5) )
+  -- TODO(JRC): Figure out how graphics that depend on user input can be
+  -- rendered easily (e.g. the currently user-selected tile).
+  state.board:render( graphics.windowbbox )
 
   --[[
   -- TODO(JRC): Figure out how each individual entity will be rendered

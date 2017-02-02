@@ -29,16 +29,20 @@ function renderable_t.render( self, bbox, strict, _contextratio )
   local rbox = bbox_t( bbox.min + roffset, rdims )
   _contextratio = _contextratio * rbox:ratio()
 
+  --[[
   do -- render bounding box for debugging
     love.graphics.push()
     love.graphics.translate( bbox.min:xy() )
     love.graphics.scale( bbox.dim:xy() )
 
+    -- TODO(JRC): Set a better line width value based on the current scale
+    -- being used for the renderable.
     love.graphics.setLineWidth( 0.01 )
-    love.graphics.setColor( colors.tuple('yellow') )
+    love.graphics.setColor( colors.tuple('magenta') )
     love.graphics.polygon( 'line', 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0 )
     love.graphics.pop()
   end
+  --]]
 
   do -- render actual object contents
     love.graphics.push()

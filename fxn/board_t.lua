@@ -1,5 +1,6 @@
 local struct = require( 'fxn.struct' )
 local graph_t = require( 'fxn.graph_t' )
+local renderable_t = require( 'fxn.renderable_t' )
 local colors = require( 'fxn.colors' )
 local util = require( 'fxn.util' )
 
@@ -14,12 +15,17 @@ local util = require( 'fxn.util' )
 
 --[[ Constructor ]]--
 
-local board_t = struct( {}, '_graph', graph_t(), '_cells', {}, 'width', 0, 'height', 0 )
+local board_t = struct( {renderable_t},
+  '_graph', graph_t(), '_cells', {},
+  'width', 0, 'height', 0
+)
 
 function board_t._init( self, width, height )
   self._graph = graph_t( true, false )
   self._cells = {}
   self.width, self.height = width, height
+
+  self._targetratio = 1.0
 
   -- insert all cells into the graph --
   for celly = 1, self.height do
@@ -135,9 +141,7 @@ end
 
 --[[ Public Render Functions ]]--
 
--- TODO(JRC): Update this function based on the decisions made for the rendering
--- function interface.
-function board_t.render( self )
+function board_t._render( self )
   -- TODO(JRC): The ordering here is a bit hacky and should be removed in the
   -- general 'board_t' version.  These labels should be replaced by incremental
   -- numbers instead with the lowest-lest edge is 0 and increments of 1 CCW.
