@@ -42,8 +42,9 @@ function love.load()
   fxn.model.board = fxn.board_t( 10, 10 )
 
   fxn.view.viewport = fxn.bbox_t( 0.0, 0.0, 1.0, 1.0 )
-
   fxn.input.mouse = fxn.vector_t( 0.0, 0.0 )
+
+  fxn.model.board:setrbox( fxn.view.viewport )
 end
 
 function love.keypressed( key, scancode, isrepeat )
@@ -69,7 +70,7 @@ function love.draw()
 
   -- TODO(JRC): Figure out how graphics that depend on user input can be
   -- rendered easily (e.g. the currently user-selected tile).
-  fxn.model.board:render( fxn.view.viewport )
+  fxn.model.board:render()
 
   --[[
   -- TODO(JRC): Figure out how each individual entity will be rendered

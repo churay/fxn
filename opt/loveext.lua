@@ -173,4 +173,8 @@ function love.graphics.getTransform()
   return lgxformcopy
 end
 
+function love.graphics.getRatio()
+  return love.graphics.getWidth() / love.graphics.getHeight()
+end
+
 return lxt

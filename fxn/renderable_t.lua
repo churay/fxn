@@ -5,35 +5,24 @@ local colors = require( 'fxn.colors' )
 
 --[[ Constructor ]]--
 
-local renderable_t = struct( {}, '_subrenders', {}, '_targetratio', false )
+local renderable_t = struct( {},
+  '_rbox', false,
+  '_rratio', false,
+  '_roverlays', {}
+)
 
 --[[ Public Functions ]]--
 
-function renderable_t.render( self, bbox, strict, _contextratio )
-  local strict = strict or false
-  local _contextratio = _contextratio or
-    love.graphics.getWidth() / love.graphics.getHeight()
+function renderable_t.render( self, debug )
+  local debug = debug or false
 
-  local roffset, rdims = vector_t(), vector_t( bbox.dim:xy() )
-  if not strict and self._targetratio then
-    local wscaled = self._targetratio * bbox.dim.y / _contextratio
-    local hscaled = _contextratio * bbox.dim.x / self._targetratio
-
-    if wscaled < bbox.dim.x then
-      roffset.x, rdims.x = ( bbox.dim.x - wscaled ) / 2.0, wscaled
-    else
-      roffset.y, rdims.y = ( bbox.dim.y - hscaled ) / 2.0, hscaled
-    end
-  end
-
-  local rbox = bbox_t( bbox.min + roffset, rdims )
-  _contextratio = _contextratio * rbox:ratio()
-
+  -- TODO(JRC): Update this code so that the original ratio can be viewed
+  -- if it's still useful for debugging.
   --[[
-  do -- render bounding box for debugging
+  if debug then -- render bounding box for debugging
     love.graphics.push()
-    love.graphics.translate( bbox.min:xy() )
-    love.graphics.scale( bbox.dim:xy() )
+    love.graphics.translate( self._rbox.min:xy() )
+    love.graphics.scale( self._rbox.dim:xy() )
 
     -- TODO(JRC): Set a better line width value based on the current scale
     -- being used for the renderable.
@@ -46,17 +35,37 @@ function renderable_t.render( self, bbox, strict, _contextratio )
 
   do -- render actual object contents
     love.graphics.push()
-    love.graphics.translate( rbox.min:xy() )
-    love.graphics.scale( rbox.dim:xy() )
+    love.graphics.translate( self._rbox.min:xy() )
+    love.graphics.scale( self._rbox.dim:xy() )
 
     self:_render()
-    for _, subrenders in ipairs( self._subrenders ) do
-      local subrenderable, subbbox, substrict = unpack( subrender )
-      subrenderable:render( subbbox, substrict, _contextratio )
+    for _, overlayrenderable in ipairs( self._roverlays ) do
+      overlayrenderable:render( debug )
     end
 
     love.graphics.pop()
   end
+end
+
+function renderable_t.setrbox( self, rbox, strict, _cratio )
+  local strict = strict or false
+  -- TODO(JRC): Take this value from parent renderable instead of argument.
+  local _cratio = _cratio or love.graphics.getRatio()
+
+  local roffset, rdims = vector_t(), vector_t( rbox.dim:xy() )
+  if not strict and self._rratio then
+    local wscaled = self._rratio * rbox.dim.y / _cratio
+    local hscaled = _cratio * rbox.dim.x / self._rratio
+
+    if wscaled < rbox.dim.x then
+      roffset.x, rdims.x = ( rbox.dim.x - wscaled ) / 2.0, wscaled
+    else
+      roffset.y, rdims.y = ( rbox.dim.y - hscaled ) / 2.0, hscaled
+    end
+  end
+
+  self._rbox = bbox_t( rbox.min + roffset, rdims )
+  _cratio = _cratio * self._rbox:ratio()
 end
 
 --[[ Private Functions ]]--

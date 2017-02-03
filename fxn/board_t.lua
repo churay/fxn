@@ -25,7 +25,7 @@ function board_t._init( self, width, height )
   self._cells = {}
   self.width, self.height = width, height
 
-  self._targetratio = 1.0
+  self._rratio = 1.0
 
   -- insert all cells into the graph --
   for celly = 1, self.height do
