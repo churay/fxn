@@ -8,7 +8,8 @@ local colors = require( 'fxn.colors' )
 local renderable_t = struct( {},
   '_rbox', false,
   '_rratio', false,
-  '_roverlays', {}
+  '_rparent', false,
+  '_rchildren', {}
 )
 
 --[[ Public Functions ]]--
@@ -39,14 +40,17 @@ function renderable_t.render( self, debug )
     love.graphics.scale( self._rbox.dim:xy() )
 
     self:_render()
-    for _, overlayrenderable in ipairs( self._roverlays ) do
-      overlayrenderable:render( debug )
+    for _, renderlayer in ipairs( self._rlayers ) do
+      renderlayer:render( debug )
     end
 
     love.graphics.pop()
   end
 end
 
+-- TODO(JRC): Consider changing this interface so that it manipulates the
+-- existing render box instead of outright replacing it.
+-- TODO(JRC): Come up with a better name for this function.
 function renderable_t.setrbox( self, rbox, strict, _cratio )
   local strict = strict or false
   -- TODO(JRC): Take this value from parent renderable instead of argument.
@@ -66,6 +70,19 @@ function renderable_t.setrbox( self, rbox, strict, _cratio )
 
   self._rbox = bbox_t( rbox.min + roffset, rdims )
   _cratio = _cratio * self._rbox:ratio()
+
+  -- TODO(JRC): Fix this so that the correct values are set when setting
+  -- up the rendering boxes for all layers.
+  for _, renderlayer in ipairs( self._rlayers ) do
+    renderlayer:setrbox( renderlayer._rbox, strict, _cratio )
+  end
+end
+
+-- TODO(JRC): This function will return the window box of the instance renderable,
+-- which can be used for mouse intersection.  This is calculated by using inverse
+-- transformation of all of the parent transformations.
+function renderable_t.wbox( self )
+  return nil
 end
 
 --[[ Private Functions ]]--
