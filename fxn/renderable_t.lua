@@ -8,8 +8,9 @@ local colors = require( 'fxn.colors' )
 local renderable_t = struct( {},
   '_rbox', false,
   '_rratio', false,
-  '_rparent', false,
-  '_rchildren', {}
+  '_cratio', false,
+  '_rcanvas', false,
+  '_rlayers', {}
 )
 
 --[[ Public Functions ]]--
@@ -40,48 +41,27 @@ function renderable_t.render( self, debug )
     love.graphics.scale( self._rbox.dim:xy() )
 
     self:_render()
-    for _, renderlayer in ipairs( self._rlayers ) do
-      renderlayer:render( debug )
+    for _, layer in ipairs( self._rlayers ) do
+      layer:render( debug )
     end
 
     love.graphics.pop()
   end
 end
 
--- TODO(JRC): Consider changing this interface so that it manipulates the
--- existing render box instead of outright replacing it.
--- TODO(JRC): Come up with a better name for this function.
-function renderable_t.setrbox( self, rbox, strict, _cratio )
+function renderable_t.addlayer( self, layer, rbox, strict )
+  local rbox = rbox or bbox_t( 0.0, 0.0, 1.0, 1.0 )
   local strict = strict or false
-  -- TODO(JRC): Take this value from parent renderable instead of argument.
-  local _cratio = _cratio or love.graphics.getRatio()
 
-  local roffset, rdims = vector_t(), vector_t( rbox.dim:xy() )
-  if not strict and self._rratio then
-    local wscaled = self._rratio * rbox.dim.y / _cratio
-    local hscaled = _cratio * rbox.dim.x / self._rratio
-
-    if wscaled < rbox.dim.x then
-      roffset.x, rdims.x = ( rbox.dim.x - wscaled ) / 2.0, wscaled
-    else
-      roffset.y, rdims.y = ( rbox.dim.y - hscaled ) / 2.0, hscaled
-    end
-  end
-
-  self._rbox = bbox_t( rbox.min + roffset, rdims )
-  _cratio = _cratio * self._rbox:ratio()
-
-  -- TODO(JRC): Fix this so that the correct values are set when setting
-  -- up the rendering boxes for all layers.
-  for _, renderlayer in ipairs( self._rlayers ) do
-    renderlayer:setrbox( renderlayer._rbox, strict, _cratio )
-  end
+  table.insert( self._rlayers, layer )
+  layer._rcanvas = self
+  layer:_setrbox( rbox, strict )
 end
 
--- TODO(JRC): This function will return the window box of the instance renderable,
--- which can be used for mouse intersection.  This is calculated by using inverse
--- transformation of all of the parent transformations.
 function renderable_t.wbox( self )
+  -- TODO(JRC): This function will return the window box of the instance renderable,
+  -- which can be used for mouse intersection.  This is calculated by using inverse
+  -- transformation of all of the parent transformations.
   return nil
 end
 
@@ -91,6 +71,7 @@ end
 -- with the implementation that renders the object to a one-by-one space with
 -- the origin in the bottom-left corner.
 function renderable_t._render( self, ... )
+  --[[
   local cpadding = 1.0e-1
 
   love.graphics.setColor( colors.tuple('red') )
@@ -100,6 +81,35 @@ function renderable_t._render( self, ... )
   love.graphics.polygon( 'fill',
     0.0, 1.0 - cpadding, 1.0 - cpadding, 0.0,
     1.0, cpadding, cpadding, 1.0 )
+  --]]
+end
+
+-- TODO(JRC): Consider changing this interface so that it manipulates the
+-- existing render box instead of outright replacing it.
+function renderable_t._setrbox( self, rbox, strict )
+  local strict = strict or false
+  local cratio = self._rcanvas._cratio
+
+  local roffset, rdims = vector_t(), vector_t( rbox.dim:xy() )
+  if not strict and self._rratio then
+    local wscaled = self._rratio * rbox.dim.y / cratio
+    local hscaled = cratio * rbox.dim.x / self._rratio
+
+    if wscaled < rbox.dim.x then
+      roffset.x, rdims.x = ( rbox.dim.x - wscaled ) / 2.0, wscaled
+    else
+      roffset.y, rdims.y = ( rbox.dim.y - hscaled ) / 2.0, hscaled
+    end
+  end
+
+  self._rbox = bbox_t( rbox.min + roffset, rdims )
+  self._cratio = cratio * self._rbox:ratio()
+
+  -- TODO(JRC): Fix this so that the correct values are set when setting
+  -- up the rendering boxes for all layers.
+  for _, layer in ipairs( self._rlayers ) do
+    layer:_setrbox( layer._rbox, strict )
+  end
 end
 
 return renderable_t
