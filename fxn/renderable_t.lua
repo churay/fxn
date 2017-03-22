@@ -9,6 +9,7 @@ local renderable_t = struct( {},
   '_rbox', false,
   '_rratio', false,
   '_cratio', false,
+  '_wbox', false,
   '_rcanvas', false,
   '_rlayers', {}
 )
@@ -18,35 +19,28 @@ local renderable_t = struct( {},
 function renderable_t.render( self, debug )
   local debug = debug or false
 
-  -- TODO(JRC): Update this code so that the original ratio can be viewed
-  -- if it's still useful for debugging.
-  --[[
-  if debug then -- render bounding box for debugging
-    love.graphics.push()
-    love.graphics.translate( self._rbox.min:xy() )
-    love.graphics.scale( self._rbox.dim:xy() )
+  love.graphics.push()
+  love.graphics.translate( self._rbox.min:xy() )
+  love.graphics.scale( self._rbox.dim:xy() )
 
-    -- TODO(JRC): Set a better line width value based on the current scale
-    -- being used for the renderable.
+  self:_render()
+  for _, layer in ipairs( self._rlayers ) do layer:render( debug ) end
+
+  if not self._wbox then
+    local wboxx, wboxy = love.graphics.transform( 0.0, 0.0, false )
+    local wboxw, wboxh = love.graphics.transform( 1.0, 1.0, true )
+    self._wbox = bbox_t( wboxx, wboxy, wboxw, wboxh )
+  end
+
+  -- TODO(JRC): Set different colors based on the canvas in order to prevent
+  -- accidental information obfuscation.
+  if debug then
     love.graphics.setLineWidth( 0.01 )
     love.graphics.setColor( colors.tuple('magenta') )
     love.graphics.polygon( 'line', 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0 )
-    love.graphics.pop()
   end
-  --]]
+  love.graphics.pop()
 
-  do -- render actual object contents
-    love.graphics.push()
-    love.graphics.translate( self._rbox.min:xy() )
-    love.graphics.scale( self._rbox.dim:xy() )
-
-    self:_render()
-    for _, layer in ipairs( self._rlayers ) do
-      layer:render( debug )
-    end
-
-    love.graphics.pop()
-  end
 end
 
 function renderable_t.addlayer( self, layer, rbox, strict )
@@ -56,13 +50,6 @@ function renderable_t.addlayer( self, layer, rbox, strict )
   table.insert( self._rlayers, layer )
   layer._rcanvas = self
   layer:_setrbox( rbox, strict )
-end
-
-function renderable_t.wbox( self )
-  -- TODO(JRC): This function will return the window box of the instance renderable,
-  -- which can be used for mouse intersection.  This is calculated by using inverse
-  -- transformation of all of the parent transformations.
-  return nil
 end
 
 --[[ Private Functions ]]--

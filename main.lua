@@ -71,7 +71,7 @@ function love.draw()
 
   -- TODO(JRC): Figure out how graphics that depend on user input can be
   -- rendered easily (e.g. the currently user-selected tile).
-  fxn.model.board:render()
+  fxn.view.viewport:render( fxn.global.debug )
 
   --[[
   -- TODO(JRC): Figure out how each individual entity will be rendered
