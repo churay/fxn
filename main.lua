@@ -41,8 +41,14 @@ function love.load()
   fxn.model.func = fxn.func_t( function(x) return math.sin(x) end )
   fxn.model.board = fxn.board_t( 10, 10 )
 
-  fxn.view.viewport = fxn.renderable_t( fxn.bbox_t(0.0, 0.0, 1.0, 1.0),
-    false, love.graphics.getRatio() )
+  local viewport_t = fxn.struct( {fxn.renderable_t} )
+  viewport_t._init = function( self )
+    self._rbox = fxn.bbox_t( 0.0, 0.0, 1.0, 1.0 )
+    self._cratio = love.graphics.getRatio()
+  end
+  viewport_t._render = function( self ) end
+
+  fxn.view.viewport = viewport_t()
   fxn.input.mouse = fxn.vector_t( 0.0, 0.0 )
 
   fxn.view.viewport:addlayer( fxn.model.board )

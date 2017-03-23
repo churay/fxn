@@ -74,7 +74,6 @@ end
 -- with the implementation that renders the object to a one-by-one space with
 -- the origin in the bottom-left corner.
 function renderable_t._render( self, ... )
-  --[[
   local cpadding = 1.0e-1
 
   love.graphics.setColor( colors.tuple('red') )
@@ -84,7 +83,6 @@ function renderable_t._render( self, ... )
   love.graphics.polygon( 'fill',
     0.0, 1.0 - cpadding, 1.0 - cpadding, 0.0,
     1.0, cpadding, cpadding, 1.0 )
-  --]]
 end
 
 -- TODO(JRC): Consider changing this interface so that it manipulates the
