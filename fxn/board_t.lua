@@ -17,7 +17,8 @@ local util = require( 'fxn.util' )
 
 local board_t = struct( {renderable_t},
   '_graph', graph_t(), '_cells', {},
-  'width', 0, 'height', 0
+  'width', 0, 'height', 0,
+  '_scellidx', -1
 )
 
 function board_t._init( self, width, height )
@@ -71,7 +72,7 @@ function board_t._init( self, width, height )
   end
 end
 
---[[ Public Data Functions ]]--
+--[[ Model Functions ]]--
 
 function board_t.addpiece( self, piece, cellidx )
   self._cells[cellidx] = piece
@@ -139,7 +140,18 @@ function board_t.getpiecemoves( self, cellidx )
   return getmoves( cellidx, cellsteps, cellstepmaxs, 0 )
 end
 
---[[ Public Render Functions ]]--
+--[[ View Functions ]]--
+
+function board_t.selectcell( self, wpos )
+  local scellrpos = self:getrpos( wpos )
+  if scellrpos ~= nil then
+    local scellx = math.floor( scellrpos.x * self.width ) + 1
+    local scelly = math.floor( scellrpos.y * self.height ) + 1
+    self._scellidx = self:_getcellidx( scellx, scelly )
+  else
+    self._scellidx = -1
+  end
+end
 
 function board_t._render( self )
   -- TODO(JRC): The ordering here is a bit hacky and should be removed in the
@@ -176,7 +188,17 @@ function board_t._render( self )
       love.graphics.translate( gfxcellx, gfxcelly )
       love.graphics.scale( gfxcellw, gfxcellh )
 
+      if cellidx == self._scellidx then
+        love.graphics.setColor( colors.tuple('green') )
+        love.graphics.polygon( 'fill', gfxedgelen, gfxedgelen,
+          1.0 - gfxedgelen, gfxedgelen,
+          1.0 - gfxedgelen, 1.0 - gfxedgelen,
+          gfxedgelen, 1.0 - gfxedgelen )
+      end
+
       for _, celldir in ipairs( celldirorder ) do
+        -- TODO(JRC): If this is the selected cell, render it with a slightly
+        -- different color.
         local diralpha = celldirtypes[celldir] == 0 and 255 or 64
 
         love.graphics.setColor( colors.tuple('black', diralpha) )
@@ -193,23 +215,6 @@ function board_t._render( self )
       love.graphics.pop()
     end
   end
-end
-
-function board_t.rendercell( self, cellx, celly )
-  local gfxcellw, gfxcellh = 1.0 / self.width, 1.0 / self.height
-  local gfxedgelen, gfxgridlen = 5e-2, 5e-3
-
-  local gfxcellx = math.floor( self.width * cellx ) / self.width
-  local gfxcelly = math.floor( self.height * celly ) / self.height
-
-  love.graphics.translate( gfxcellx, gfxcelly )
-  love.graphics.scale( gfxcellw, gfxcellh )
-
-  love.graphics.setColor( colors.tuple('green') )
-  love.graphics.polygon( 'fill', gfxedgelen, gfxedgelen,
-    1.0 - gfxedgelen, gfxedgelen,
-    1.0 - gfxedgelen, 1.0 - gfxedgelen,
-    gfxedgelen, 1.0 - gfxedgelen )
 end
 
 --[[ Private Functions ]]--

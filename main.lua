@@ -58,6 +58,8 @@ function love.update( dt )
 
   fxn.global.fnum = fxn.global.fnum + 1
   fxn.global.avgfps = 1 / dt
+
+  fxn.model.board:selectcell( fxn.input.mouse )
 end
 
 function love.draw()
