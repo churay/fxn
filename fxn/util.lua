@@ -98,6 +98,35 @@ end
 
 --[[ Language Functions ]]--
 
+function util.pprint( o )
+  print( util.pretty(o) )
+end
+
+-- TODO(JRC): Update this function so that metatable values are printed.
+function util.pretty( o, noexpand, _currdepth )
+  local noexpand = noexpand or false
+  local _currdepth = _currdepth or 0
+  local padding = '  '
+
+  local prefix = string.rep( padding, _currdepth )
+  if type( o ) == 'string' then
+    return string.format( '%q', o )
+  elseif type( o ) == 'table' and not noexpand then
+    local elemstrs = {}
+    for k, v in pairs( o ) do
+      local kstr = util.pretty(k, true, 0)
+      local vstr = util.pretty(v, false, _currdepth + 1)
+      local elemstr = string.format( '%s%s[%s] = %s', prefix, padding, kstr, vstr )
+      table.insert( elemstrs, elemstr )
+    end
+
+    return string.format( '{%s%s}', ( #elemstrs ~= 0 and '\n' or ''),
+      table.concat(elemstrs, ',\n') )
+  else
+    return tostring( o )
+  end
+end
+
 function util.copy( orig, copymt, _copied )
   if type( orig ) ~= 'table' then return orig end
   if _copied and _copied[orig] then return _copied[orig] end
