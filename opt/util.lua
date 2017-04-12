@@ -68,7 +68,7 @@ end
 
 --[[ String Functions ]]--
 
-function util.istring( str, sep )
+function util.iterstring( str, sep )
   local sep = sep or '\n'
   local pattern = string.format( '(.-)(%s)', sep )
 
@@ -167,7 +167,7 @@ function util.libload( libbase, debug )
 
   function libmt.__index( libtable, libpath )
     local libenv, libenvpath = libtable, libbase
-    for partidx, libpathpart in util.istring( libpath, '%.' ) do
+    for partidx, libpathpart in util.iterstring( libpath, '%.' ) do
       libenvpath = string.format( '%s.%s', libenvpath, libpathpart )
 
       local libenvmods = rawget( libenv, '__modules' )

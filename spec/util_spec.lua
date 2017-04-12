@@ -117,13 +117,45 @@ describe( 'util', function()
     end )
   end )
 
-  describe( 'istring', function()
-    before_each( function()
-      
+  describe( 'iterstring', function()
+    local function iterstringtable( ... )
+      local ittable = {}
+      for cidx, comp in util.iterstring( ... ) do
+        table.insert( ittable, {cidx, comp} )
+      end
+      return ittable
+    end
+
+    it( 'returns the source string if the separator is not found', function()
+      local teststrs = { 'abcde', '12345', 'hello', 'world' }
+      for _, teststr in ipairs( teststrs ) do
+        assert.are.same( {{1, teststr}}, iterstringtable(teststr, '@') )
+      end
     end )
 
-    it( '', function()
-      pending( 'TODO(JRC): Write test cases for this function.' )
+    it( 'returns subsequent segments of the string separated by the specified ' ..
+        'separator when its in the source string and not duplicated', function()
+      local teststr = 'one two three'
+
+      assert.are.same( {{1, 'one'}, {2, 'two'}, {3, 'three'}},
+        iterstringtable(teststr, ' ') )
+      assert.are.same( {{1, 'one'}, {2, 'three'}},
+        iterstringtable(teststr, ' two ') )
+    end )
+
+    it( 'returns empty entries when instances of the given separator are ' ..
+        'adjacent in the source string', function()
+      local testsep = 't'
+      for sepreps = 1, 3 do
+        local teststr = string.format( 'T%sT', string.rep(testsep, sepreps) )
+
+        local expectediter = {{1, 'T'}, {sepreps + 1, 'T'}}
+        for sepidx = 1, sepreps - 1 do
+          table.insert( expectediter, sepidx + 1, {sepidx + 1, ''} )
+        end
+
+        assert.are.same( expectediter, iterstringtable(teststr, testsep) )
+      end
     end )
   end )
 
