@@ -1,4 +1,4 @@
-local util = require( 'fxn.util' )
+local util = require( 'util' )
 local fxn = util.libload( 'fxn' )
 
 -- NOTE(JRC): If any of the reserved variable tables are overloaded with

@@ -1,7 +1,7 @@
 require( 'bustedext' )
 local bbox_t = require( 'fxn.bbox_t' )
 local vector_t = require( 'fxn.vector_t' )
-local util = require( 'fxn.util' )
+local util = require( 'util' )
 
 describe( 'bbox_t', function()
   --[[ Testing Constants ]]--

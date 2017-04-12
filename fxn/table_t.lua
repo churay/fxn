@@ -1,4 +1,4 @@
-local util = require( 'fxn.util' )
+local util = require( 'util' )
 
 --[[ Constructor ]]--
 

@@ -1,5 +1,5 @@
 require( 'bustedext' )
-local util = require( 'fxn.util' )
+local util = require( 'util' )
 
 describe( 'love.ext', function()
   --[[ Testing Constants ]]--

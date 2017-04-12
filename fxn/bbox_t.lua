@@ -1,4 +1,4 @@
-local util = require( 'fxn.util' )
+local util = require( 'util' )
 local struct = require( 'fxn.struct' )
 local vector_t = require( 'fxn.vector_t' )
 

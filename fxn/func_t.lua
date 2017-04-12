@@ -1,5 +1,5 @@
 local struct = require( 'fxn.struct' )
-local util = require( 'fxn.util' )
+local util = require( 'util' )
 
 -- NOTE(JRC): This module tends to create a lot of lightweight functions that only
 -- serve one purpose, which may cause problems come time for garbage collection.

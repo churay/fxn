@@ -1,10 +1,52 @@
 require( 'bustedext' )
-local util = require( 'fxn.util' )
+local util = require( 'util' )
 
 describe( 'util', function()
   --[[ Testing Functions ]]--
 
-  -- Mathematical Functions --
+  describe( 'pretty', function()
+    before_each( function()
+      
+    end )
+
+    it( '', function()
+      pending( 'TODO(JRC): Write test cases for this function.' )
+    end )
+  end )
+
+  describe( 'copy', function()
+    it( 'can create independent copies of non-table types', function()
+      local teststr = 'test'
+      local copystr = util.copy( teststr )
+      assert.are.equal( teststr, copystr )
+
+      local testfxn = function() return 'test' end
+      local copyfxn = util.copy( testfxn )
+      assert.are.equal( testfxn, copyfxn )
+    end )
+
+    it( 'can create independent copies of shallow (depth 1) tables', function()
+      local shallowtable = { 300, 'test', false, function() return 1.0 end }
+      local copytable = util.copy( shallowtable )
+      assert.are.same( shallowtable, copytable )
+      assert.are_not.equal( shallowtable, copytable )
+    end )
+
+    it( 'can create independent copies of deep tables', function()
+      local deeptable = { 'test', {300, false}, {true, {13.37, 'leet'}, 'more'} }
+      local copytable = util.copy( deeptable )
+      assert.are.same( deeptable, copytable )
+      assert.are_not.equal( deeptable, copytable )
+    end )
+
+    it( 'can create independent copies of tables that have metatables', function()
+      pending( 'TODO(JRC)' )
+    end )
+
+    it( 'can create independent copies of tables that have memory cycles', function()
+      pending( 'TODO(JRC)' )
+    end )
+  end )
 
   describe( 'inrange', function()
     local stdmin, stdmax = nil, nil
@@ -75,7 +117,15 @@ describe( 'util', function()
     end )
   end )
 
-  -- Lua Language Functions --
+  describe( 'istring', function()
+    before_each( function()
+      
+    end )
+
+    it( '', function()
+      pending( 'TODO(JRC): Write test cases for this function.' )
+    end )
+  end )
 
   describe( 'map', function()
     local emptylist = nil
@@ -262,37 +312,13 @@ describe( 'util', function()
     end )
   end )
 
-  describe( 'copy', function()
-    it( 'can create independent copies of non-table types', function()
-      local teststr = 'test'
-      local copystr = util.copy( teststr )
-      assert.are.equal( teststr, copystr )
-
-      local testfxn = function() return 'test' end
-      local copyfxn = util.copy( testfxn )
-      assert.are.equal( testfxn, copyfxn )
+  describe( 'libload', function()
+    before_each( function()
+      
     end )
 
-    it( 'can create independent copies of shallow (depth 1) tables', function()
-      local shallowtable = { 300, 'test', false, function() return 1.0 end }
-      local copytable = util.copy( shallowtable )
-      assert.are.same( shallowtable, copytable )
-      assert.are_not.equal( shallowtable, copytable )
-    end )
-
-    it( 'can create independent copies of deep tables', function()
-      local deeptable = { 'test', {300, false}, {true, {13.37, 'leet'}, 'more'} }
-      local copytable = util.copy( deeptable )
-      assert.are.same( deeptable, copytable )
-      assert.are_not.equal( deeptable, copytable )
-    end )
-
-    it( 'can create independent copies of tables that have metatables', function()
-      pending( 'TODO(JRC)' )
-    end )
-
-    it( 'can create independent copies of tables that have memory cycles', function()
-      pending( 'TODO(JRC)' )
+    it( '', function()
+      pending( 'TODO(JRC): Write test cases for this function.' )
     end )
   end )
 end )
