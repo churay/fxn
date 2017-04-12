@@ -10,7 +10,7 @@ describe( 'util', function()
     end )
 
     it( '', function()
-      pending( 'TODO(JRC): Write test cases for this function.' )
+      pending( 'TODO(JRC)' )
     end )
   end )
 
@@ -345,12 +345,87 @@ describe( 'util', function()
   end )
 
   describe( 'libload', function()
+    local LUA_OVERFXNS = { 'io.popen', 'os.execute' }
+
+    local testlib, testlibitems = false, false
+    local teststubs, testoverrides = false, false
+
+    -- TODO(JRC): This stubbing code will need to change in the future if/when
+    -- the implementation of 'util.libload' changes.
     before_each( function()
-      
+      testlib = {}
+      testlibitems = { a=true, b=true, m=false }
+      teststubs, testoverrides = {}, {}
+
+      -- io.popen: return a table that has a lines/close methods
+      testoverrides['io.popen'] = function()
+        local libpaths = { ['.']=true, ['..']=true }
+        for itemname, itemtype in pairs( testlibitems ) do
+          local itempath = string.format( '%s%s', itemname,
+            itemtype and '.lua' or '' )
+          libpaths[itempath] = true
+        end
+
+        return {
+          lines=function() return next, libpaths, nil end,
+          close=function() end
+        }
+      end
+
+      -- os.execute: return a 0/1 based on type of library item
+      testoverrides['os.execute'] = function( cmd )
+        local itemname = string.match( cmd, ' ([^ ]*)$' )
+        return testlibitems[itemname] and 1 or 0
+      end
+
+      for _, overfxn in ipairs( LUA_OVERFXNS ) do
+        local fxnnameidx = string.find( overfxn, '%.[^%.]*$' )
+        local fxnpath = string.sub( overfxn, 1, fxnnameidx )
+        local fxnname = string.sub( overfxn, fxnnameidx + 1 )
+
+        local fxnenv = _G
+        for _, fxncomp in util.iterstring( fxnpath, '%.' ) do
+          fxnenv = fxnenv[fxncomp]
+        end
+
+        teststubs[overfxn] = fxnenv[fxnname]
+        fxnenv[fxnname] = testoverrides[overfxn]
+      end
     end )
 
-    it( '', function()
-      pending( 'TODO(JRC): Write test cases for this function.' )
+    after_each( function()
+      for _, overfxn in ipairs( LUA_OVERFXNS ) do
+        local fxnnameidx = string.find( overfxn, '%.[^%.]*$' )
+        local fxnpath = string.sub( overfxn, 1, fxnnameidx )
+        local fxnname = string.sub( overfxn, fxnnameidx + 1 )
+
+        local fxnenv = _G
+        for _, fxncomp in util.iterstring( fxnpath, '%.' ) do
+          fxnenv = fxnenv[fxncomp]
+        end
+
+        fxnenv[fxnname] = teststubs[overfxn]
+      end
+    end )
+
+    it( 'returns a module table with no content loaded initially', function()
+      testlib = util.libload( 'test' )
+      for testlibitem in pairs( testlibitems ) do
+        assert.are.equal( nil, rawget(testlib, testlibitem) )
+      end
+    end )
+
+    it( 'loads modules on demand when they are accessed from the ' ..
+        'base library module', function()
+      -- TODO(JRC): Verify that each module can be loaded, that loading
+      -- calls the 'require' function, and that accesses outside of the
+      -- sanctioned modules result in nil returns.
+      pending( 'TODO(JRC)' )
+    end )
+
+    it( 'properly resolves and loads modules on demand for nested ' ..
+        'accesses (e.g. lib.x.y.z)', function()
+      pending( 'TODO(JRC)' )
     end )
   end )
 end )
