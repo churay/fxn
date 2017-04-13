@@ -345,20 +345,29 @@ describe( 'util', function()
   end )
 
   describe( 'libload', function()
-    local LUA_OVERFXNS = { 'io.popen', 'os.execute' }
+    local LUA_OVERFXNS = { 'require', 'io.popen', 'os.execute' }
 
     local testlib, testlibitems = false, false
-    local teststubs, testoverrides = false, false
+    local testsrcfxns, testoverfxns = false, false
 
     -- TODO(JRC): This stubbing code will need to change in the future if/when
     -- the implementation of 'util.libload' changes.
     before_each( function()
       testlib = {}
-      testlibitems = { a=true, b=true, m=false }
-      teststubs, testoverrides = {}, {}
+      testlibitems = { ['a']=true, ['b']=true, ['m']=false }
+      testsrcfxns, testoverfxns = {}, {}
+
+      -- require: works like normal unless a library item is loaded,
+      -- which causes a default value to be returned
+      local luarequire = _G.require
+      testoverfxns['require'] = function( modname )
+        if testlibitems[modname] ~= nil then return modname
+        else return luarequire( modname ) end
+      end
+      -- spy.on( testoverfxns, 'require' )
 
       -- io.popen: return a table that has a lines/close methods
-      testoverrides['io.popen'] = function()
+      testoverfxns['io.popen'] = function()
         local libpaths = { ['.']=true, ['..']=true }
         for itemname, itemtype in pairs( testlibitems ) do
           local itempath = string.format( '%s%s', itemname,
@@ -373,38 +382,44 @@ describe( 'util', function()
       end
 
       -- os.execute: return a 0/1 based on type of library item
-      testoverrides['os.execute'] = function( cmd )
+      testoverfxns['os.execute'] = function( cmd )
         local itemname = string.match( cmd, ' ([^ ]*)$' )
         return testlibitems[itemname] and 1 or 0
       end
 
       for _, overfxn in ipairs( LUA_OVERFXNS ) do
         local fxnnameidx = string.find( overfxn, '%.[^%.]*$' )
-        local fxnpath = string.sub( overfxn, 1, fxnnameidx )
-        local fxnname = string.sub( overfxn, fxnnameidx + 1 )
+        local fxnpath, fxnname = '', overfxn
+        if fxnnameidx ~= nil then
+          fxnpath = string.sub( overfxn, 1, fxnnameidx )
+          fxnname = string.sub( overfxn, fxnnameidx + 1 )
+        end
 
         local fxnenv = _G
         for _, fxncomp in util.iterstring( fxnpath, '%.' ) do
           fxnenv = fxnenv[fxncomp]
         end
 
-        teststubs[overfxn] = fxnenv[fxnname]
-        fxnenv[fxnname] = testoverrides[overfxn]
+        testsrcfxns[overfxn] = fxnenv[fxnname]
+        fxnenv[fxnname] = testoverfxns[overfxn]
       end
     end )
 
     after_each( function()
       for _, overfxn in ipairs( LUA_OVERFXNS ) do
         local fxnnameidx = string.find( overfxn, '%.[^%.]*$' )
-        local fxnpath = string.sub( overfxn, 1, fxnnameidx )
-        local fxnname = string.sub( overfxn, fxnnameidx + 1 )
+        local fxnpath, fxnname = '', overfxn
+        if fxnnameidx ~= nil then
+          fxnpath = string.sub( overfxn, 1, fxnnameidx )
+          fxnname = string.sub( overfxn, fxnnameidx + 1 )
+        end
 
         local fxnenv = _G
         for _, fxncomp in util.iterstring( fxnpath, '%.' ) do
           fxnenv = fxnenv[fxncomp]
         end
 
-        fxnenv[fxnname] = teststubs[overfxn]
+        fxnenv[fxnname] = testsrcfxns[overfxn]
       end
     end )
 
@@ -417,10 +432,19 @@ describe( 'util', function()
 
     it( 'loads modules on demand when they are accessed from the ' ..
         'base library module', function()
-      -- TODO(JRC): Verify that each module can be loaded, that loading
-      -- calls the 'require' function, and that accesses outside of the
-      -- sanctioned modules result in nil returns.
       pending( 'TODO(JRC)' )
+
+      testlib = util.libload( 'test' )
+      for testlibitem in pairs( testlibitems ) do
+        local testlibmod = testlib[testlibitem]
+        assert.stub( testoverfxns['require'] ).was.called_with( testlibitem )
+      end
+
+      local testnonlibitems = { 'x', 'y' }
+      for testnonlibitem in pairs( nontestlibitem ) do
+        local testlibmod = testlib[testlibitem]
+        assert.stub( testoverfxns['require'] ).was_not.called_with( testnonlibitem )
+      end
     end )
 
     it( 'properly resolves and loads modules on demand for nested ' ..
